@@ -6,7 +6,6 @@
     "type": "git",
     "url": "https://github.com/colvint/collection-admin.git"
   },
-  "readme": "README.md",
   "main": "./dist/collection-admin.js",
   "scripts": {
     "test": "jest",
