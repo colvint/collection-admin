@@ -1,14 +1,18 @@
 {
   "name": "collection-admin",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Client-side React-based CRUD admin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colvint/collection-admin.git"
+  },
   "readme": "README.md",
-  "main": "./dist/build.js",
+  "main": "./dist/collection-admin.js",
   "scripts": {
     "test": "jest",
-    "build": "babel src --out-file ./dist/build.js",
-    "test:watch": "watch 'jest' ./tests ./src",
-    "build:watch": "watch 'npm run build' ./src",
+    "build": "babel src --out-dir dist",
+    "test:watch": "watch 'jest' tests src",
+    "build:watch": "watch 'npm run build' src",
     "prepublish": "npm run build"
   },
   "keywords": [
@@ -25,12 +29,12 @@
       "./node_modules/react",
       "./node_modules/react-dom",
       "./node_modules/react-addons-test-utils",
+      "./node_modules/chance",
       "./node_modules/underscore"
     ]
   },
   "dependencies": {
     "chance": "^1.0.2",
-    "meteor-node-stubs": "~0.2.0",
     "react": "^15.0.1",
     "react-bootstrap": "^0.29.0",
     "react-dom": "^15.0.1",
