@@ -1,6 +1,6 @@
 {
   "name": "collection-admin",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Client-side React-based CRUD admin",
   "repository": {
     "type": "git",
