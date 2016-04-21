@@ -2,6 +2,8 @@
   "name": "collection-admin",
   "version": "0.0.4",
   "description": "Client-side React-based CRUD admin",
+  "author": "Taurus Colvin <taurus.colvin@gmail.com> (http://tauruscolvin.com)",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/colvint/collection-admin.git"
@@ -20,8 +22,6 @@
     "client",
     "admin"
   ],
-  "author": "Taurus Colvin <taurus.colvin@gmail.com> (http://tauruscolvin.com)",
-  "license": "MIT",
   "jest": {
     "testDirectoryName": "tests",
     "unmockedModulePathPatterns": [
