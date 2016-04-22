@@ -1,31 +1,31 @@
 jest.unmock('../src/collection-admin.js');
-jest.unmock('../test-fixtures/people.js');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactTU from 'react-addons-test-utils';
-import createPeople from '../test-fixtures/people.js';
-import CollectionAdmin from '../src/collection-admin.js';
-import Chance from 'chance';
 import _ from 'underscore';
+import sinon from 'sinon';
 
-const chance = new Chance();
+import createPeople from '../test-fixtures/people.js';
+
+import CollectionAdmin from '../src/collection-admin.js';
 
 describe('collection admin', () => {
   const items = createPeople(3);
   const allItemIds = _.pluck(items, '_id');
 
   let component;
+  let fetchItems = sinon.stub();
+
+  fetchItems.returns(items);
 
   beforeEach(() => {
-    component = ReactTU.renderIntoDocument(<CollectionAdmin items={items} />);
+    component = ReactTU.renderIntoDocument(<CollectionAdmin fetchItems={fetchItems} />);
     component.setState({selectedItemIds: []});
   });
 
   it('lists all items', () => {
-    const rows = ReactTU.scryRenderedDOMComponentsWithClass(component, 'item');
-
-    expect(rows.length).toEqual(3);
+    expect(component.allItems().length).toEqual(3);
   });
 
   it('knows the fields', () => {
@@ -59,7 +59,6 @@ describe('collection admin', () => {
     const itemSelectors = ReactTU.scryRenderedDOMComponentsWithClass(component, 'itemSelector');
 
     expect(itemSelectors.length).toEqual(3);
-
     expect(component.state.selectedItemIds).toEqual([]);
     component.onItemSelected(allItemIds[0]);
     expect(component.state.selectedItemIds).toContain(allItemIds[0]);
@@ -71,5 +70,21 @@ describe('collection admin', () => {
     expect(component.isItemSelected(allItemIds[0])).toBeFalsy();
     component.updateSelectedItems(_.first(allItemIds, 1));
     expect(component.isItemSelected(allItemIds[0])).toBeTruthy();
+  });
+
+  it('filters items', () => {
+    const itemFilter = {firstName: items[0].firstName};
+
+    expect(component.state.itemFilter).toEqual({});
+    component.setState({itemFilter: itemFilter});
+    expect(fetchItems.calledWith(itemFilter)).toBeTruthy();
+  });
+
+  it('sorts items', () => {
+    const sortSpecifier = {firstName: 1};
+
+    expect(component.state.fetchOptions).toEqual({});
+    component.onSort(sortSpecifier);
+    expect(fetchItems.calledWith({}, {sort: sortSpecifier})).toBeTruthy();
   });
 });

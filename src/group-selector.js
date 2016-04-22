@@ -1,9 +1,6 @@
 import React from 'react';
 import _ from 'underscore';
-import {
-  DropdownButton,
-  MenuItem,
-} from 'react-bootstrap';
+import {DropdownButton, MenuItem} from 'react-bootstrap';
 
 export default class GroupSelector extends React.Component {
   constructor(props) {

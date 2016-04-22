@@ -1,25 +1,28 @@
 import React from 'react';
+import ReactUpdate from 'react-addons-update';
+import {Table, Checkbox} from 'react-bootstrap';
 import _ from 'underscore';
 import {humanize} from 'underscore.string';
-import {
-  Table,
-  Checkbox,
-} from 'react-bootstrap';
+
 import GroupSelector from './group-selector.js';
+import Sorter from './sorter.js';
 
 export default class CollectionAdmin extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      selectedItemIds: []
+      selectedItemIds: [],
+      itemFilter: {},
+      fetchOptions: {},
     };
 
     this.isItemSelected = this.isItemSelected.bind(this);
+    this.onSort = this.onSort.bind(this);
   }
 
   fields() {
-    return _.keys(_.first(this.props.items));
+    return _.keys(_.first(this.allItems()));
   }
 
   headers() {
@@ -51,9 +54,29 @@ export default class CollectionAdmin extends React.Component {
     });
   }
 
+  allItems() {
+    return this.props.fetchItems();
+  }
+
+  filteredAndSortedItems() {
+    return this.props.fetchItems(
+      this.state.itemFilter,
+      this.state.fetchOptions
+    );
+  }
+
+  onSort(sortSpecifier = {}) {
+    const fetchOptions = ReactUpdate(
+      this.state.fetchOptions,
+      {$merge: {sort: sortSpecifier}}
+    );
+
+    this.setState({fetchOptions: fetchOptions});
+  }
+
   render() {
-    const items = this.props.items;
-    const allItemIds = _.pluck(items, '_id');
+    const items = this.filteredAndSortedItems();
+    const itemIds = _.pluck(items, '_id');
     const headers = this.headers();
 
     return (
@@ -62,7 +85,7 @@ export default class CollectionAdmin extends React.Component {
           <tr>
             <th>
               <GroupSelector
-                allItemIds={allItemIds}
+                allItemIds={itemIds}
                 selectedItemIds={this.state.selectedItemIds}
                 onSelected={this.updateSelectedItems.bind(this)}
               />
@@ -70,6 +93,7 @@ export default class CollectionAdmin extends React.Component {
             {_.map(headers, (header, i) => {
               return (
                 <th key={i} className="header">
+                  <Sorter field={header} onSort={this.onSort} />
                   {humanize(header)}
                 </th>
               );
@@ -104,6 +128,6 @@ export default class CollectionAdmin extends React.Component {
 }
 
 CollectionAdmin.propTypes = {
-  items: React.PropTypes.array.isRequired,
+  fetchItems: React.PropTypes.func.isRequired,
   loading: React.PropTypes.bool,
 };

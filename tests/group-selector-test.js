@@ -1,16 +1,12 @@
 jest.unmock('../src/group-selector.js');
-jest.unmock('../test-fixtures/people.js');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactTU from 'react-addons-test-utils';
 import createPeople from '../test-fixtures/people.js';
 import GroupSelector from '../src/group-selector.js';
-import Chance from 'chance';
 import _ from 'underscore';
 import sinon from 'sinon';
-
-const chance = new Chance();
 
 describe('group selector', () => {
   const items = createPeople(3);
