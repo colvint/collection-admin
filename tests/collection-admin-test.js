@@ -1,8 +1,10 @@
 jest.unmock('../src/collection-admin.js');
+jest.unmock('../test-fixtures/people.js');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import ReactTU from 'react-addons-test-utils';
+import createPeople from '../test-fixtures/people.js';
 import CollectionAdmin from '../src/collection-admin.js';
 import Chance from 'chance';
 import _ from 'underscore';
@@ -10,14 +12,8 @@ import _ from 'underscore';
 const chance = new Chance();
 
 describe('collection admin', () => {
-  const items = _.map([1, 2, 3], (i) => {
-    return {
-      _id: chance.guid(),
-      firstName: chance.first(),
-      lastName: chance.last(),
-      age: chance.age(),
-    };
-  });
+  const items = createPeople(3);
+  const allItemIds = _.pluck(items, '_id');
 
   let component;
 
@@ -65,16 +61,15 @@ describe('collection admin', () => {
     expect(itemSelectors.length).toEqual(3);
 
     expect(component.state.selectedItemIds).toEqual([]);
-    component.onItemSelected(items[0]._id);
-    expect(component.state.selectedItemIds).toContain(items[0]._id);
-    component.onItemSelected(items[1]._id);
-    expect(component.state.selectedItemIds).toContain(items[1]._id);
+    component.onItemSelected(allItemIds[0]);
+    expect(component.state.selectedItemIds).toContain(allItemIds[0]);
+    component.onItemSelected(allItemIds[1]);
+    expect(component.state.selectedItemIds).toContain(allItemIds[1]);
   });
 
-  it('selects all items', () => {
-    expect(component.state.selectedItemIds);
-    console.log(component.refs);
-    ReactTU.Simulate.click(component.refs.selectAll);
-    expect(component.state.selectedItemIds.length).toEqual(3)
+  it('knows whether an item is selected', function () {
+    expect(component.isItemSelected(allItemIds[0])).toBeFalsy();
+    component.updateSelectedItems(_.first(allItemIds, 1));
+    expect(component.isItemSelected(allItemIds[0])).toBeTruthy();
   });
 });

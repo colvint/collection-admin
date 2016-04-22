@@ -29,7 +29,8 @@
       "./node_modules/react-dom",
       "./node_modules/react-addons-test-utils",
       "./node_modules/chance",
-      "./node_modules/underscore"
+      "./node_modules/underscore",
+      "./node_modules/sinon"
     ]
   },
   "dependencies": {
@@ -49,6 +50,7 @@
     "babel-preset-react": "^6.5.0",
     "jest-cli": "^11.0.1",
     "react-addons-test-utils": "^15.0.1",
+    "sinon": "^1.17.3",
     "watch": "^0.17.1"
   }
 }
