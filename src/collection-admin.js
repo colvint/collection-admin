@@ -14,6 +14,8 @@ export default class CollectionAdmin extends React.Component {
     this.state = {
       selectedItemIds: []
     };
+
+    this.isItemSelected = this.isItemSelected.bind(this);
   }
 
   fields() {
@@ -81,7 +83,7 @@ export default class CollectionAdmin extends React.Component {
                 <td>
                   <Checkbox
                     className="itemSelector"
-                    checked={_.contains(this.state.selectedItemIds, item._id)}
+                    checked={this.isItemSelected(item._id)}
                     onChange={this.onItemSelected.bind(this, item._id)}
                   />
                 </td>

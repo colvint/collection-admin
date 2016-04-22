@@ -6,6 +6,14 @@ import {
 } from 'react-bootstrap';
 
 export default class GroupSelector extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.selectAll = this.selectAll.bind(this);
+    this.selectNone = this.selectNone.bind(this);
+    this.selectInverse = this.selectInverse.bind(this);
+  }
+
   selectAll() {
     this.props.onSelected(this.props.allItemIds);
   }
