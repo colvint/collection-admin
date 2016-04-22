@@ -47,12 +47,9 @@ describe('collection admin', () => {
   });
 
   it('displays the column headers', () => {
-    const headers = ReactTU.scryRenderedDOMComponentsWithClass(component, 'header');
-
-    expect(headers.length).toEqual(3);
-    expect(headers[0].textContent).toEqual('First name');
-    expect(headers[1].textContent).toEqual('Last name');
-    expect(headers[2].textContent).toEqual('Age');
+    expect(component.refs.firstNameHeader.props.children).toEqual('First name');
+    expect(component.refs.lastNameHeader.props.children).toEqual('Last name');
+    expect(component.refs.ageHeader.props.children).toEqual('Age');
   });
 
   it('selects individual items', () => {

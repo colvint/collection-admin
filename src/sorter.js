@@ -41,9 +41,10 @@ export default class Sorter extends React.Component {
     return (
       <span
         className={classnames('fa', iconKlasses)}
-        style={{marginRight: 5, cursor: "pointer"}}
-        onClick={this.toggleSort}
-      />
+        style={{paddingLeft: 5, cursor: "pointer"}}
+        onClick={this.toggleSort}>
+        {this.props.children}
+      </span>
     );
   }
 }
