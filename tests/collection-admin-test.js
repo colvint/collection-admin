@@ -80,12 +80,12 @@ describe('collection admin', () => {
   it('sorts items', () => {
     expect(component.state.fetchOptions).toEqual({sort: {}});
     component.onSort({firstName: 1});
-    expect(fetchItems.calledWith({}, {sort: {firstName: 1}})).toBeTruthy();
+    expect(component.state.fetchOptions).toEqual({sort: {firstName: 1}});
     component.onSort({firstName: -1});
-    expect(fetchItems.calledWith({}, {sort: {firstName: -1}})).toBeTruthy();
+    expect(component.state.fetchOptions).toEqual({sort: {firstName: -1}});
     component.onSort({lastName: 1});
-    expect(fetchItems.calledWith({}, {sort: {firstName: -1, lastName: 1}})).toBeTruthy();
-    component.onSort({lastName: 0});
-    expect(fetchItems.calledWith({}, {sort: {firstName: -1, lastName: 0}})).toBeTruthy();
+    expect(component.state.fetchOptions).toEqual({sort: {firstName: -1, lastName: 1}});
+    component.onSort({lastName: null});
+    expect(component.state.fetchOptions).toEqual({sort: {firstName: -1}});
   });
 });

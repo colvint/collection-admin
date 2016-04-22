@@ -66,7 +66,16 @@ export default class CollectionAdmin extends React.Component {
   }
 
   onSort(sortSpecifier = {}) {
-    const sort = ReactUpdate(this.state.fetchOptions.sort, {$merge: sortSpecifier});
+    const field = _.keys(sortSpecifier)[0];
+    let sort = this.state.fetchOptions.sort;
+
+    if (_.isNull(sortSpecifier[field])) {
+      delete sort[field];
+      sort = ReactUpdate(this.state.fetchOptions.sort, {$set: sort});
+    } else {
+      sort = ReactUpdate(sort, {$merge: sortSpecifier});
+    }
+
     const fetchOptions = ReactUpdate(this.state.fetchOptions, {$merge: {sort: sort}})
 
     this.setState({fetchOptions: fetchOptions});

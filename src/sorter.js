@@ -18,7 +18,7 @@ export default class Sorter extends React.Component {
     if (this.state.direction === 1) {
       direction = -1;
     } else if (this.state.direction === -1) {
-      direction = 0;
+      direction = null;
     } else {
       direction = 1;
     }
@@ -30,7 +30,7 @@ export default class Sorter extends React.Component {
 
   render() {
     const iconKlasses = {
-      'fa-sort': (this.state.direction === 0),
+      'fa-sort': (this.state.direction === null),
       'fa-sort-up': (this.state.direction === 1),
       'fa-sort-down': (this.state.direction === -1),
     };

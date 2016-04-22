@@ -34,6 +34,6 @@ describe('sorter', () => {
     // then toggles to back to unsorted
     component.toggleSort();
     expect(component.state.direction).toBeNull;
-    expect(onSortSpy.calledWith({firstName: 0})).toBeTruthy();
+    expect(onSortSpy.calledWith({firstName: null})).toBeTruthy();
   });
 });
