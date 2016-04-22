@@ -3,7 +3,7 @@ import _ from 'underscore';
 
 const chance = new Chance();
 
-const createPeople = function (count) {
+const createPeople = (count) => {
   return _.range(count).map((i) => {
     return {
       _id: chance.guid(),
