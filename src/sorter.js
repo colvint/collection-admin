@@ -18,23 +18,19 @@ export default class Sorter extends React.Component {
     if (this.state.direction === 1) {
       direction = -1;
     } else if (this.state.direction === -1) {
-      direction = null;
+      direction = 0;
     } else {
       direction = 1;
     }
 
     this.setState({direction: direction});
 
-    if (direction) {
-      this.props.onSort({[this.props.field]: direction});
-    } else {
-      this.props.onSort({});
-    }
+    this.props.onSort({[this.props.field]: direction});
   }
 
   render() {
     const iconKlasses = {
-      'fa-sort': (this.state.direction === null),
+      'fa-sort': (this.state.direction === 0),
       'fa-sort-up': (this.state.direction === 1),
       'fa-sort-down': (this.state.direction === -1),
     };

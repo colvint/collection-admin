@@ -78,10 +78,14 @@ describe('collection admin', () => {
   });
 
   it('sorts items', () => {
-    const sortSpecifier = {firstName: 1};
-
-    expect(component.state.fetchOptions).toEqual({});
-    component.onSort(sortSpecifier);
-    expect(fetchItems.calledWith({}, {sort: sortSpecifier})).toBeTruthy();
+    expect(component.state.fetchOptions).toEqual({sort: {}});
+    component.onSort({firstName: 1});
+    expect(fetchItems.calledWith({}, {sort: {firstName: 1}})).toBeTruthy();
+    component.onSort({firstName: -1});
+    expect(fetchItems.calledWith({}, {sort: {firstName: -1}})).toBeTruthy();
+    component.onSort({lastName: 1});
+    expect(fetchItems.calledWith({}, {sort: {firstName: -1, lastName: 1}})).toBeTruthy();
+    component.onSort({lastName: 0});
+    expect(fetchItems.calledWith({}, {sort: {firstName: -1, lastName: 0}})).toBeTruthy();
   });
 });

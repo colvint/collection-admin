@@ -14,7 +14,7 @@ export default class CollectionAdmin extends React.Component {
     this.state = {
       selectedItemIds: [],
       itemFilter: {},
-      fetchOptions: {},
+      fetchOptions: {sort: {}},
     };
 
     this.isItemSelected = this.isItemSelected.bind(this);
@@ -66,10 +66,8 @@ export default class CollectionAdmin extends React.Component {
   }
 
   onSort(sortSpecifier = {}) {
-    const fetchOptions = ReactUpdate(
-      this.state.fetchOptions,
-      {$merge: {sort: sortSpecifier}}
-    );
+    const sort = ReactUpdate(this.state.fetchOptions.sort, {$merge: sortSpecifier});
+    const fetchOptions = ReactUpdate(this.state.fetchOptions, {$merge: {sort: sort}})
 
     this.setState({fetchOptions: fetchOptions});
   }
