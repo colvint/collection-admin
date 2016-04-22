@@ -38,13 +38,12 @@ export default class Sorter extends React.Component {
       'fa-sort-up': (this.state.direction === 1),
       'fa-sort-down': (this.state.direction === -1),
     };
+
     return (
-      <span
-        className={classnames('fa', iconKlasses)}
-        style={{paddingLeft: 5, cursor: "pointer"}}
-        onClick={this.toggleSort}>
+      <div style={{cursor: "pointer"}} onClick={this.toggleSort}>
+        <span className={classnames('fa', iconKlasses)} style={{marginRight: 5}} />
         {this.props.children}
-      </span>
+      </div>
     );
   }
 }

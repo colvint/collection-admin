@@ -93,10 +93,7 @@ export default class CollectionAdmin extends React.Component {
             {_.map(headers, (header, i) => {
               return (
                 <th key={i}>
-                  <Sorter
-                    ref={`${header}Header`}
-                    field={header}
-                    onSort={this.onSort}>
+                  <Sorter ref={`${header}Header`} field={header} onSort={this.onSort}>
                     {humanize(header)}
                   </Sorter>
                 </th>
