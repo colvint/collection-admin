@@ -34,8 +34,9 @@ export default class Sorter extends React.Component {
 
   render() {
     const iconKlasses = {
-      'fa-sort-up': (this.state.direction == 1),
-      'fa-sort-down': (this.state.direction == -1),
+      'fa-sort': (this.state.direction === null),
+      'fa-sort-up': (this.state.direction === 1),
+      'fa-sort-down': (this.state.direction === -1),
     };
     return (
       <span
