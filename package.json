@@ -11,10 +11,9 @@
   "main": "./dist/collection-admin.js",
   "scripts": {
     "test": "jest",
-    "build": "babel src --out-dir dist",
-    "prepublish": "npm run build",
     "test:watch": "watch 'jest' tests src",
-    "build:watch": "watch 'npm run build' src",
+    "build": "BABEL_ENV=production babel src --out-dir dist",
+    "prepublish": "npm run build",
     "watch": "npm run watch:server & npm run watch:bundle & wait",
     "watch:server": "nodemon --exec babel-node --ignore static/bundle.js -- static/server.js",
     "watch:bundle": "watchify static/client.js -v -t babelify -g envify -p livereactload -o static/bundle.js"
