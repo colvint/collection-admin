@@ -1,6 +1,6 @@
 {
   "name": "collection-admin",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Client-side React-based CRUD admin",
   "author": "Taurus Colvin <taurus.colvin@gmail.com> (http://tauruscolvin.com)",
   "license": "MIT",
