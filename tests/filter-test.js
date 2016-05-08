@@ -16,15 +16,24 @@ describe('filter', () => {
     )
   })
 
-  it('filters', () => {
-    expect(component.state.enabledFilter).toBeNull()
+  it('toggles filters', () => {
+    expect(component.state.conditionType).toBeNull()
 
-    component.toggleFilter("cellIsFoobar")
-    expect(component.state.enabledFilter).toEqual("cellIsFoobar")
-    expect(onFilterSpy.calledWith({firstName: {cellIsFoobar: true}})).toBeTruthy()
+    component.conditionToggled("isEmpty")
+    expect(component.state.conditionType).toEqual("isEmpty")
+    expect(onFilterSpy.calledWith({firstName: {isEmpty: true}})).toBeTruthy()
 
-    component.toggleFilter("cellIsFoobar")
-    expect(component.state.enabledFilter).toBeNull()
-    expect(onFilterSpy.calledWith({firstName: {cellIsFoobar: false}})).toBeTruthy()
+    component.conditionToggled("isEmpty")
+    expect(component.state.conditionType).toBeNull()
+    expect(onFilterSpy.calledWith({firstName: {isEmpty: false}})).toBeTruthy()
+  })
+
+  it('updates condition values', () => {
+    expect(component.state.conditionType).toBeNull()
+
+    component.conditionToggled("textContains")
+    component.conditionValueChanged({target: {value: "Autism"}})
+    expect(component.state.conditionValue).toEqual("Autism")
+    expect(onFilterSpy.calledWith({firstName: {textContains: true, value: "Autism"}})).toBeTruthy()
   })
 })

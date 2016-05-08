@@ -1,13 +1,13 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {Table, Checkbox} from 'react-bootstrap'
+import {Table, Checkbox, Form} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
 
 import GroupSelector from './group-selector.js'
 import Sorter from './sorter.js'
 import Filter from './filter.js'
-import MongoFilter from './filters/mongo.js'
+import Condition, { ConditionTypes } from './mongo/condition.js'
 
 export default class CollectionAdmin extends React.Component {
   constructor(props) {
@@ -84,16 +84,16 @@ export default class CollectionAdmin extends React.Component {
     this.setState({fetchOptions: fetchOptions})
   }
 
-  onFilter(filterSpecifier) {
-    const field = _.keys(filterSpecifier)[0]
-    const filterType = _.keys(filterSpecifier[field])[0]
-    const filterEnabled = filterSpecifier[field][filterType]
+  onFilter(conditionSpecifier) {
+    const field = _.keys(conditionSpecifier)[0]
+    const conditionType = _.keys(conditionSpecifier[field])[0]
+    const conditionEnabled = conditionSpecifier[field][conditionType]
     let itemFilter = this.state.itemFilter
-    let filter
+    let condition
 
-    if (filterEnabled) {
-      filter = new MongoFilter(filterType, field)
-      itemFilter = ReactUpdate(itemFilter, {$merge: filter.getQuery()})
+    if (conditionEnabled) {
+      condition = new Condition(field, conditionSpecifier[field].value)
+      itemFilter = ReactUpdate(itemFilter, {$merge: condition[conditionType]()})
     } else{
       delete itemFilter[field]
     }
@@ -118,11 +118,13 @@ export default class CollectionAdmin extends React.Component {
             </th>
             {_.map(headers, (header, i) => {
               return (
-                <th key={i}>
-                  <Sorter ref={`${header}Sorter`} field={header} onSort={this.onSort}>
-                    {humanize(header)}
-                  </Sorter>
-                  <Filter ref={`${header}Filter`} field={header} onFilter={this.onFilter}/>
+                <th key={i} style={{maxWidth: 150}}>
+                  <Form inline>
+                    <Sorter ref={`${header}Sorter`} field={header} onSort={this.onSort}>
+                      {humanize(header)}
+                    </Sorter>
+                    <Filter ref={`${header}Filter`} field={header} onFilter={this.onFilter}/>
+                  </Form>
                 </th>
               )
             })}

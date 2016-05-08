@@ -1,5 +1,5 @@
 jest.unmock('../src/collection-admin.js')
-jest.unmock('../src/filters/mongo.js')
+jest.unmock('../src/mongo/condition.js')
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -77,7 +77,7 @@ describe('collection admin', () => {
     expect(component.refs.ageFilter).not.toBeUndefined()
 
     expect(component.state.itemFilter).toEqual({})
-    component.onFilter({firstName: {cellIsEmpty: true}})
+    component.onFilter({firstName: {isEmpty: true}})
     expect(component.state.itemFilter).toEqual({firstName: {$exists: false}})
   })
 
