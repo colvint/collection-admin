@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {Table, Checkbox, Form} from 'react-bootstrap'
+import {Table, Checkbox} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
 
@@ -118,13 +118,11 @@ export default class CollectionAdmin extends React.Component {
             </th>
             {_.map(headers, (header, i) => {
               return (
-                <th key={i} style={{maxWidth: 150}}>
-                  <Form inline>
-                    <Sorter ref={`${header}Sorter`} field={header} onSort={this.onSort}>
-                      {humanize(header)}
-                    </Sorter>
-                    <Filter ref={`${header}Filter`} field={header} onFilter={this.onFilter}/>
-                  </Form>
+                <th key={i}>
+                  <Sorter ref={`${header}Sorter`} field={header} onSort={this.onSort}>
+                    {humanize(header)}
+                  </Sorter>
+                  <Filter ref={`${header}Filter`} field={header} onFilter={this.onFilter}/>
                 </th>
               )
             })}

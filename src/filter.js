@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {DropdownButton, FormGroup, FormControl, ControlLabel, MenuItem} from 'react-bootstrap'
+import {DropdownButton, Form, FormControl, ControlLabel, MenuItem} from 'react-bootstrap'
 import classnames from 'classnames'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
@@ -46,14 +46,13 @@ export default class Filter extends React.Component {
 
     if (this.state.conditionType && conditionDef.valueType) {
       valueControl = (
-        <FormGroup id={`${this.props.field}-${this.state.conditionType}`}>
-          <ControlLabel>{humanize(this.state.conditionType)}</ControlLabel>
-          {' '}
+        <form style={{marginTop: 10}}>
           <FormControl type="text"
             value={this.state.conditionValue}
             onChange={this.conditionValueChanged}
+            placeholder={`Only show if ${humanize(this.state.conditionType)}...`}
           />
-        </FormGroup>
+        </form>
       )
     }
 
@@ -82,7 +81,6 @@ export default class Filter extends React.Component {
             )
           })}
         </DropdownButton>
-        {' '}
         {valueControl}
       </span>
     )
