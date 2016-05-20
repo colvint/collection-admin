@@ -4,7 +4,7 @@ import {DropdownButton, Form, FormControl, ControlLabel, MenuItem} from 'react-b
 import classnames from 'classnames'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
-import Condition, { ConditionTypes } from './mongo/condition'
+import Condition, { ConditionTypes } from './conditions/meteor'
 
 export default class Filter extends React.Component {
   constructor(props) {

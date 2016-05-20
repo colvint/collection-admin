@@ -1,8 +1,8 @@
-jest.unmock('../../src/mongo/condition.js')
+jest.unmock('../../src/conditions/meteor.js')
 
-import Condition from '../../src/mongo/condition.js'
+import Condition from '../../src/conditions/meteor'
 
-describe('mongo condition', () => {
+describe('meteor condition', () => {
   it('returns the is empty query', () => {
     const condition = new Condition('foo')
 

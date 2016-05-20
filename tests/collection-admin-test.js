@@ -1,5 +1,5 @@
-jest.unmock('../src/collection-admin.js')
-jest.unmock('../src/mongo/condition.js')
+jest.unmock('../src/collection-admin')
+jest.unmock('../src/conditions/meteor')
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -7,13 +7,25 @@ import ReactTU from 'react-addons-test-utils'
 import _ from 'underscore'
 import sinon from 'sinon'
 
-import createPeople from '../test-fixtures/people.js'
+import createPeople from '../test-fixtures/people'
 
-import CollectionAdmin from '../src/collection-admin.js'
+import CollectionAdmin from '../src/collection-admin'
 
 describe('collection admin', () => {
   const items = createPeople(3)
   const allItemIds = _.pluck(items, '_id')
+  const itemSchema = {
+    firstName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    age: {
+      type: String,
+    }
+  }
+  const onSaveSpy = sinon.spy()
 
   let component
   let fetchItems = sinon.stub()
@@ -21,7 +33,14 @@ describe('collection admin', () => {
   fetchItems.returns(items)
 
   beforeEach(() => {
-    component = ReactTU.renderIntoDocument(<CollectionAdmin fetchItems={fetchItems} />)
+    component = ReactTU.renderIntoDocument(
+      <CollectionAdmin
+        itemType="stock"
+        fetchItems={fetchItems}
+        itemSchema={itemSchema}
+        onSave={onSaveSpy}
+      />
+    )
     component.setState({selectedItemIds: []})
   })
 
@@ -29,12 +48,8 @@ describe('collection admin', () => {
     expect(component.allItems().length).toEqual(3)
   })
 
-  it('knows the fields', () => {
-    expect(component.fields()).toEqual(['_id', 'firstName', 'lastName', 'age'])
-  })
-
-  it('does not include _id in the headers', () => {
-    expect(component.headers()).toEqual(['firstName', 'lastName', 'age'])
+  it('reads columns from the item schema', () => {
+    expect(component.columns()).toEqual(['firstName', 'lastName', 'age'])
   })
 
   it('displays the item data', () => {
@@ -91,5 +106,11 @@ describe('collection admin', () => {
     expect(component.state.fetchOptions).toEqual({sort: {firstName: -1, lastName: 1}})
     component.onSort({lastName: null})
     expect(component.state.fetchOptions).toEqual({sort: {firstName: -1}})
+  })
+
+  it('opens the new item modal', () => {
+    expect(component.state.newItemIsOpen).toBeFalsy()
+    component.newItem()
+    expect(component.state.newItemIsOpen).toBeTruthy()
   })
 })

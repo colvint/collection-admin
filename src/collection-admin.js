@@ -1,13 +1,14 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {Table, Checkbox} from 'react-bootstrap'
+import {Button, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
 
-import GroupSelector from './group-selector.js'
-import Sorter from './sorter.js'
-import Filter from './filter.js'
-import Condition, { ConditionTypes } from './mongo/condition.js'
+import GroupSelector from './group-selector'
+import Sorter from './sorter'
+import Filter from './filter'
+import Condition, { ConditionTypes } from './conditions/meteor'
+import ItemEditor from './item-editor'
 
 export default class CollectionAdmin extends React.Component {
   constructor(props) {
@@ -17,19 +18,16 @@ export default class CollectionAdmin extends React.Component {
       selectedItemIds: [],
       itemFilter: {},
       fetchOptions: {sort: {}},
+      newItemIsOpen: false,
+      editingItemId: null,
     }
 
     this.isItemSelected = this.isItemSelected.bind(this)
+    this.filteredAndSortedItems = this.filteredAndSortedItems.bind(this)
     this.onSort = this.onSort.bind(this)
     this.onFilter = this.onFilter.bind(this)
-  }
-
-  fields() {
-    return _.keys(_.first(this.allItems()))
-  }
-
-  headers() {
-    return _.without(this.fields(), '_id', 'id')
+    this.newItem = this.newItem.bind(this)
+    this.closeNewItem = this.closeNewItem.bind(this)
   }
 
   onItemSelected(itemId) {
@@ -59,6 +57,10 @@ export default class CollectionAdmin extends React.Component {
 
   allItems() {
     return this.props.fetchItems()
+  }
+
+  columns() {
+    return _.keys(this.props.itemSchema)
   }
 
   filteredAndSortedItems() {
@@ -100,62 +102,90 @@ export default class CollectionAdmin extends React.Component {
     this.setState({itemFilter: itemFilter})
   }
 
+  newItem() {
+    this.setState({newItemIsOpen: true})
+  }
+
+  closeNewItem() {
+    this.setState({newItemIsOpen: false})
+  }
+
+  editItem(itemId) {
+    this.setState({editingItemId: itemId})
+  }
+
   render() {
     const items = this.filteredAndSortedItems()
     const itemIds = _.pluck(items, '_id')
-    const headers = this.headers()
+    const columns = this.columns()
+    const controls = (
+      <ButtonToolbar>
+        <Button onClick={this.newItem}>New</Button>
+        <ItemEditor isNew show={this.state.newItemIsOpen} onHide={this.closeNewItem} {...this.props} />
+      </ButtonToolbar>
+    )
 
     return (
-      <Table className="table table-bordered table-striped table-hover">
-        <thead>
-          <tr>
-            <th>
-              <GroupSelector
-                allItemIds={itemIds}
-                selectedItemIds={this.state.selectedItemIds}
-                onSelected={this.updateSelectedItems.bind(this)}
-              />
-            </th>
-            {_.map(headers, (header, i) => {
+      <Panel header={controls}>
+        <Table className="table table-bordered table-striped table-hover">
+          <thead>
+            <tr>
+              <th>
+                <GroupSelector
+                  allItemIds={itemIds}
+                  selectedItemIds={this.state.selectedItemIds}
+                  onSelected={this.updateSelectedItems.bind(this)}
+                />
+              </th>
+              {_.map(columns, (column, i) => {
+                return (
+                  <th key={i}>
+                    <Sorter ref={`${column}Sorter`} field={column} onSort={this.onSort}>
+                      {humanize(column)}
+                    </Sorter>
+                    <Filter ref={`${column}Filter`} field={column} onFilter={this.onFilter}/>
+                  </th>
+                )
+              })}
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {_.map(items, (item, i) => {
               return (
-                <th key={i}>
-                  <Sorter ref={`${header}Sorter`} field={header} onSort={this.onSort}>
-                    {humanize(header)}
-                  </Sorter>
-                  <Filter ref={`${header}Filter`} field={header} onFilter={this.onFilter}/>
-                </th>
+                <tr className="item" key={i}>
+                  <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
+                    <Checkbox
+                      className="itemSelector"
+                      checked={this.isItemSelected(item._id)}
+                      onChange={this.onItemSelected.bind(this, item._id)}
+                    />
+                  </td>
+                  {_.map(columns, (column, j) => {
+                    return (
+                      <td style={{verticalAlign: "middle"}} key={j} className={column}>
+                        {item[column]}
+                      </td>
+                    )
+                  })}
+                  <td>
+                    <Button onClick={this.editItem.bind(this, item._id)}>Edit</Button>
+
+                  </td>
+                </tr>
               )
             })}
-          </tr>
-        </thead>
-        <tbody>
-          {_.map(items, (item, i) => {
-            return (
-              <tr className="item" key={i}>
-                <td>
-                  <Checkbox
-                    className="itemSelector"
-                    checked={this.isItemSelected(item._id)}
-                    onChange={this.onItemSelected.bind(this, item._id)}
-                  />
-                </td>
-                {_.map(headers, (header, j) => {
-                  return (
-                    <td key={j} className={header}>
-                      {item[header]}
-                    </td>
-                  )
-                })}
-              </tr>
-            )
-          })}
-        </tbody>
-      </Table>
+          </tbody>
+        </Table>
+      </Panel>
     )
   }
 }
 
 CollectionAdmin.propTypes = {
-  fetchItems: React.PropTypes.func.isRequired,
   loading: React.PropTypes.bool,
+  itemType: React.PropTypes.string.isRequired,
+  itemSchema: React.PropTypes.object.isRequired,
+  fetchItems: React.PropTypes.func.isRequired,
+  onSave: React.PropTypes.func.isRequired,
 }

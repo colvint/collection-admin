@@ -1,10 +1,18 @@
 import express from "express"
 import React from "react"
 import {renderToString} from "react-dom/server"
+import fetchItems, { itemSchema } from "./model"
 import CollectionAdmin from "../src/collection-admin"
-import fetchItems from "./model"
 
 const app = express()
+const renderedComponent = renderToString(
+  <CollectionAdmin
+    itemType="stock"
+    itemSchema={itemSchema}
+    fetchItems={fetchItems}
+    onSave={() => {}}
+  />
+)
 
 app.get("/", (req, res) => {
   res.send(`<!DOCTYPE html>
@@ -15,7 +23,7 @@ app.get("/", (req, res) => {
         <title>Collection Admin</title>
       </head>
       <body>
-        <div id="app">${renderToString(<CollectionAdmin fetchItems={fetchItems} />)}</div>
+        <div id="app">${renderedComponent}</div>
         <script type="text/javascript" src="/static/bundle.js"></script>
       </body>
     </html>`)

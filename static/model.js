@@ -1,4 +1,16 @@
-import _ from 'underscore';
+import _ from 'underscore'
+
+const itemSchema = {
+  ticker: {
+    type: String,
+  },
+  lastPrice: {
+    type: Number,
+  },
+  dateOfIPO: {
+    type: Date,
+  }
+}
 
 const items = [
   {_id: '1', ticker: 'GOOG', lastPrice: 312.35},
@@ -19,4 +31,4 @@ const fetchItems = (selector = {}, fetchOptions = {}) => {
   }
 }
 
-export default fetchItems;
+export { fetchItems as default, itemSchema }
