@@ -28,6 +28,7 @@ export default class CollectionAdmin extends React.Component {
     this.onFilter = this.onFilter.bind(this)
     this.newItem = this.newItem.bind(this)
     this.closeNewItem = this.closeNewItem.bind(this)
+    this.onAddItem = this.onAddItem.bind(this)
   }
 
   onItemSelected(itemId) {
@@ -43,6 +44,11 @@ export default class CollectionAdmin extends React.Component {
     }
 
     this.updateSelectedItems(selectedItemIds)
+  }
+
+  onAddItem(item){
+    this.props.fetchItems().push(item);
+    this.closeNewItem();
   }
 
   isItemSelected(itemId) {
@@ -121,7 +127,7 @@ export default class CollectionAdmin extends React.Component {
     const controls = (
       <ButtonToolbar>
         <Button onClick={this.newItem}>New</Button>
-        <ItemEditor isNew show={this.state.newItemIsOpen} onHide={this.closeNewItem} {...this.props} />
+        <ItemEditor onAddItem={this.onAddItem} isNew show={this.state.newItemIsOpen} onHide={this.closeNewItem} {...this.props} />
       </ButtonToolbar>
     )
 
