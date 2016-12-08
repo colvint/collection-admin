@@ -13,13 +13,13 @@ import ItemEditor from './item-editor'
 export default class CollectionAdmin extends React.Component {
   constructor(props) {
     super(props)
-
     this.state = {
       selectedItemIds: [],
       itemFilter: {},
       fetchOptions: {sort: {}},
       newItemIsOpen: false,
       editingItemId: null,
+      item: {}
     }
 
     this.isItemSelected = this.isItemSelected.bind(this)
@@ -103,15 +103,15 @@ export default class CollectionAdmin extends React.Component {
   }
 
   newItem() {
-    this.setState({newItemIsOpen: true})
+    this.setState({newItemIsOpen: true, item: {}})
   }
 
   closeNewItem() {
     this.setState({newItemIsOpen: false})
   }
 
-  editItem(itemId) {
-    this.setState({editingItemId: itemId})
+  editItem(item) {    
+    this.setState({editingItemId: item._id, newItemIsOpen: true, item: item})
   }
 
   render() {
@@ -123,7 +123,8 @@ export default class CollectionAdmin extends React.Component {
         <Button onClick={this.newItem}>New</Button>
         <ItemEditor
           {...this.props}
-          isNew
+          item = {this.state.item}
+          isNew = {this.state.editingItemId ? false : true}
           show={this.state.newItemIsOpen}
           onHide={this.closeNewItem} />
       </ButtonToolbar>
@@ -155,7 +156,7 @@ export default class CollectionAdmin extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {_.map(items, (item, i) => {
+            {_.map(items, (item, i) => {              
               return (
                 <tr className="item" key={i}>
                   <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
@@ -173,7 +174,7 @@ export default class CollectionAdmin extends React.Component {
                     )
                   })}
                   <td>
-                    <Button onClick={this.editItem.bind(this, item._id)}>Edit</Button>
+                    <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
                   </td>
                 </tr>
               )
@@ -185,11 +186,11 @@ export default class CollectionAdmin extends React.Component {
   }
 }
 
-CollectionAdmin.propTypes = {
+CollectionAdmin.propTypes = {  
   loading: React.PropTypes.bool,
   itemType: React.PropTypes.string.isRequired,
   itemSchema: React.PropTypes.object.isRequired,
   fetchItems: React.PropTypes.func.isRequired,
   addItem: React.PropTypes.func.isRequired,
-  updateItem: React.PropTypes.func.isRequired,
+  updateItem: React.PropTypes.func.isRequired
 }

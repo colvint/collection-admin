@@ -6,9 +6,8 @@ import { humanize, titleize } from 'underscore.string'
 
 export default class ItemEditor extends Component {
 
-  constructor(props) {
+  constructor(props) {    
     super(props)
-
     this.state = { item: props.item }
     this.handleSave = this.handleSave.bind(this)
   }
@@ -32,7 +31,13 @@ export default class ItemEditor extends Component {
     if(this.props.isNew) {
       this.props.addItem(this.state.item)
     } else {
-      this.props.updateItem(this.state.item)
+      var updatedItem = {
+        _id: this.props.item._id,
+        ticker: this.state.item.ticker || this.props.item.ticker || '',
+        lastPrice: this.state.item.lastPrice || this.props.item.lastPrice || '',
+        dateOfIPO: this.state.item.dateOfIPO || this.props.item.dateOfIPO || ''
+      }
+      this.props.updateItem(this.props.item, updatedItem)
     }
 
     this.props.onHide()
@@ -41,21 +46,19 @@ export default class ItemEditor extends Component {
   render() {
     const title = titleize(`${this.props.isNew ? 'New' : 'Editing'} ${this.props.itemType}`)
     const firstField = Object.keys(this.props.itemSchema)[0]
-
-    return (
+    return (      
       <Modal show={this.props.show} onHide={this.props.onHide}>
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            {_.map(this.props.itemSchema, (fieldDef, field) => {
-
+            {_.map(this.props.itemSchema, (fieldDef, field) => {              
               const type = this._formControlTypeFromFieldDef(fieldDef)
               return (
                 <FormGroup key={field} controlId={field}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
-                  <FormControl autoFocus={field === firstField} type={type} onChange={this.handleFieldChange.bind(this, field)}/>
+                  <FormControl autoFocus={field === firstField} type={type} onChange={this.handleFieldChange.bind(this, field)} defaultValue={this.props.item[field]} />
                   <FormControl.Feedback />
                 </FormGroup>
               )

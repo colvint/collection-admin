@@ -1,7 +1,7 @@
 import express from "express"
 import React from "react"
 import {renderToString} from "react-dom/server"
-import fetchItems, { addItem, itemSchema } from "./model"
+import fetchItems, { addItem, itemSchema, updateItem } from "./model"
 import CollectionAdmin from "../src/collection-admin"
 
 const app = express()
@@ -11,7 +11,7 @@ const renderedComponent = renderToString(
     itemSchema={itemSchema}
     fetchItems={fetchItems}
     addItem={addItem}
-    updateItem={() => {}}
+    updateItem={updateItem}
   />
 )
 

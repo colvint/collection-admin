@@ -17,8 +17,12 @@ const items = []
 
 const addItem = (itemAttrs) => {
   const _id = uuidV4()
-
   items.push(_.extend({ _id: _id }, itemAttrs))
+}
+
+const updateItem = (oldItem, updatedItem) => {
+  var index = items.indexOf(oldItem);
+  items.splice(index, 1, updatedItem);
 }
 
 const fetchItems = (selector = {}, fetchOptions = {}) => {
@@ -38,4 +42,4 @@ addItem({ ticker: 'GOOG', lastPrice: 312.35 })
 addItem({ ticker: 'AAPL', lastPrice: 4.33 })
 addItem({ ticker: 'FB', lastPrice: 38.11 })
 
-export { fetchItems as default, addItem, itemSchema }
+export { fetchItems as default, addItem, itemSchema, updateItem}
