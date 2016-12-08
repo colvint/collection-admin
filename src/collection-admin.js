@@ -28,7 +28,6 @@ export default class CollectionAdmin extends React.Component {
     this.onFilter = this.onFilter.bind(this)
     this.newItem = this.newItem.bind(this)
     this.closeNewItem = this.closeNewItem.bind(this)
-    this.onAddItem = this.onAddItem.bind(this)
   }
 
   onItemSelected(itemId) {
@@ -44,11 +43,6 @@ export default class CollectionAdmin extends React.Component {
     }
 
     this.updateSelectedItems(selectedItemIds)
-  }
-
-  onAddItem(item){
-    this.props.fetchItems().push(item);
-    this.closeNewItem();
   }
 
   isItemSelected(itemId) {
@@ -127,7 +121,11 @@ export default class CollectionAdmin extends React.Component {
     const controls = (
       <ButtonToolbar>
         <Button onClick={this.newItem}>New</Button>
-        <ItemEditor onAddItem={this.onAddItem} isNew show={this.state.newItemIsOpen} onHide={this.closeNewItem} {...this.props} />
+        <ItemEditor
+          {...this.props}
+          isNew
+          show={this.state.newItemIsOpen}
+          onHide={this.closeNewItem} />
       </ButtonToolbar>
     )
 
@@ -176,7 +174,6 @@ export default class CollectionAdmin extends React.Component {
                   })}
                   <td>
                     <Button onClick={this.editItem.bind(this, item._id)}>Edit</Button>
-
                   </td>
                 </tr>
               )
@@ -193,5 +190,6 @@ CollectionAdmin.propTypes = {
   itemType: React.PropTypes.string.isRequired,
   itemSchema: React.PropTypes.object.isRequired,
   fetchItems: React.PropTypes.func.isRequired,
-  onSave: React.PropTypes.func.isRequired,
+  addItem: React.PropTypes.func.isRequired,
+  updateItem: React.PropTypes.func.isRequired,
 }

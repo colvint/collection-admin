@@ -5,7 +5,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactTU from 'react-addons-test-utils'
 import _ from 'underscore'
-import sinon from 'sinon'
 
 import createPeople from '../test-fixtures/people'
 
@@ -25,12 +24,11 @@ describe('collection admin', () => {
       type: String,
     }
   }
-  const onSaveSpy = sinon.spy()
+  const addItemSpy = jest.fn()
+  const updateItemSpy = jest.fn()
 
   let component
-  let fetchItems = sinon.stub()
-
-  fetchItems.returns(items)
+  let fetchItems = jest.fn(() => items)
 
   beforeEach(() => {
     component = ReactTU.renderIntoDocument(
@@ -38,7 +36,8 @@ describe('collection admin', () => {
         itemType="stock"
         fetchItems={fetchItems}
         itemSchema={itemSchema}
-        onSave={onSaveSpy}
+        addItem={addItemSpy}
+        updateItem={updateItemSpy}
       />
     )
     component.setState({selectedItemIds: []})

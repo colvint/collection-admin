@@ -11,7 +11,7 @@
   "main": "./dist/collection-admin.js",
   "scripts": {
     "test": "jest",
-    "test:watch": "watch 'jest --onlyChanged' tests src",
+    "test:watch": "watch 'jest --onlyChanged' __tests__ src",
     "build": "BABEL_ENV=production babel src --out-dir dist",
     "prepublish": "npm run build",
     "watch": "npm run watch:server & npm run watch:bundle & wait",
@@ -25,7 +25,6 @@
     "admin"
   ],
   "jest": {
-    "testDirectoryName": "tests",
     "unmockedModulePathPatterns": [
       "./test-fixtures",
       "./node_modules/classnames",
@@ -35,41 +34,41 @@
       "./node_modules/react-addons-update",
       "./node_modules/chance",
       "./node_modules/underscore",
-      "./node_modules/sinon",
       "./node_modules/enzyme"
     ]
   },
   "dependencies": {
-    "chance": "^1.0.2",
-    "classnames": "^2.2.3",
-    "react": "^15.0.1",
-    "react-addons-update": "^15.0.1",
-    "react-bootstrap": "^0.29.3",
-    "react-dom": "^15.0.1",
-    "react-router": "^2.0.1",
-    "underscore": "^1.8.3",
-    "underscore.string": "^3.3.4"
+    "chance": "latest",
+    "classnames": "latest",
+    "react": "latest",
+    "react-addons-update": "latest",
+    "react-bootstrap": "latest",
+    "react-dom": "latest",
+    "react-router": "latest",
+    "underscore": "latest",
+    "underscore.string": "latest",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.7.5",
-    "babel-jest": "^11.0.1",
-    "babel-plugin-react-transform": "^2.0.2",
-    "babel-polyfill": "^6.7.4",
-    "babel-preset-es2015": "^6.6.0",
-    "babel-preset-react": "^6.5.0",
-    "babelify": "^7.2.0",
-    "browserify": "^13.0.0",
-    "envify": "^3.4.0",
-    "enzyme": "^2.3.0",
-    "express": "^4.13.4",
-    "jest-cli": "^11.0.1",
-    "livereactload": "^2.2.2",
-    "nodemon": "^1.9.1",
-    "react-addons-test-utils": "^15.0.1",
-    "react-proxy": "^1.1.8",
-    "sinon": "^1.17.3",
-    "uglifyify": "^3.0.1",
-    "watch": "^0.17.1",
-    "watchify": "^3.7.0"
+    "babel-cli": "latest",
+    "babel-jest": "latest",
+    "babel-plugin-react-transform": "latest",
+    "babel-polyfill": "latest",
+    "babel-preset-es2015": "latest",
+    "babel-preset-react": "latest",
+    "babelify": "latest",
+    "browserify": "latest",
+    "envify": "latest",
+    "enzyme": "latest",
+    "express": "latest",
+    "jest": "latest",
+    "livereactload": "latest",
+    "nodemon": "latest",
+    "react-addons-test-utils": "latest",
+    "react-proxy": "latest",
+    "react-test-renderer": "latest",
+    "uglifyify": "latest",
+    "watch": "latest",
+    "watchify": "latest"
   }
 }

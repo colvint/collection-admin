@@ -1,4 +1,5 @@
 import _ from 'underscore'
+import uuidV4 from 'uuid/v4'
 
 const itemSchema = {
   ticker: {
@@ -12,11 +13,13 @@ const itemSchema = {
   }
 }
 
-const items = [
-  {_id: '1', ticker: 'GOOG', lastPrice: 312.35},
-  {_id: '2', ticker: 'AAPL', lastPrice: 4.33},
-  {_id: '3', ticker: 'FB', lastPrice: 38.11},
-]
+const items = []
+
+const addItem = (itemAttrs) => {
+  const _id = uuidV4()
+
+  items.push(_.extend({ _id: _id }, itemAttrs))
+}
 
 const fetchItems = (selector = {}, fetchOptions = {}) => {
   const sortKey = _.first(_.keys(fetchOptions.sort))
@@ -31,4 +34,8 @@ const fetchItems = (selector = {}, fetchOptions = {}) => {
   }
 }
 
-export { fetchItems as default, itemSchema }
+addItem({ ticker: 'GOOG', lastPrice: 312.35 })
+addItem({ ticker: 'AAPL', lastPrice: 4.33 })
+addItem({ ticker: 'FB', lastPrice: 38.11 })
+
+export { fetchItems as default, addItem, itemSchema }

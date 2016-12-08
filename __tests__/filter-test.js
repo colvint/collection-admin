@@ -4,11 +4,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactTU from 'react-addons-test-utils'
 import Filter from '../src/filter.js'
-import sinon from 'sinon'
 
 describe('filter', () => {
   let component
-  const onFilterSpy = sinon.spy()
+  const onFilterSpy = jest.fn()
 
   beforeEach(() => {
     component = ReactTU.renderIntoDocument(
@@ -21,11 +20,11 @@ describe('filter', () => {
 
     component.conditionToggled("isEmpty")
     expect(component.state.conditionType).toEqual("isEmpty")
-    expect(onFilterSpy.calledWith({firstName: {isEmpty: true}})).toBeTruthy()
+    expect(onFilterSpy).toHaveBeenCalledWith({firstName: {isEmpty: true}})
 
     component.conditionToggled("isEmpty")
     expect(component.state.conditionType).toBeNull()
-    expect(onFilterSpy.calledWith({firstName: {isEmpty: false}})).toBeTruthy()
+    expect(onFilterSpy).toHaveBeenCalledWith({firstName: {isEmpty: false}})
   })
 
   it('updates condition values', () => {
@@ -34,6 +33,6 @@ describe('filter', () => {
     component.conditionToggled("textContains")
     component.conditionValueChanged({target: {value: "Autism"}})
     expect(component.state.conditionValue).toEqual("Autism")
-    expect(onFilterSpy.calledWith({firstName: {textContains: true, value: "Autism"}})).toBeTruthy()
+    expect(onFilterSpy).toHaveBeenCalledWith({firstName: {textContains: true, value: "Autism"}})
   })
 })

@@ -1,6 +1,6 @@
 import React from "react"
 import { render } from "react-dom"
-import fetchItems, { itemSchema } from "./model"
+import fetchItems, { itemSchema, addItem } from "./model"
 import CollectionAdmin from "../src/collection-admin"
 
 render(
@@ -8,7 +8,8 @@ render(
     itemType="stock"
     itemSchema={itemSchema}
     fetchItems={fetchItems}
-    onSave={() => {}}
+    addItem={addItem}
+    updateItem={() => {}}
   />,
   document.getElementById("app")
 )

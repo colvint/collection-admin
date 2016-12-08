@@ -2,7 +2,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { FormControl, Modal } from 'react-bootstrap'
 import { shallow, mount, render } from 'enzyme'
-import sinon from 'sinon'
 
 jest.unmock('../src/item-editor.js')
 
@@ -19,8 +18,9 @@ const itemSchema = {
 
 describe("item-editor", () => {
   describe("new item", () => {
-    const onHideSpy = sinon.spy()
-    const onSaveSpy = sinon.spy()
+    const onHideSpy = jest.fn()
+    const addItemSpy = jest.fn()
+    const updateItemSpy = jest.fn()
 
     let wrapper
 
@@ -33,7 +33,8 @@ describe("item-editor", () => {
           itemType="person"
           itemSchema={itemSchema}
           onHide={onHideSpy}
-          onSave={onSaveSpy}
+          addItem={addItemSpy}
+          updateItem={updateItemSpy}
         />
       )
     })
@@ -53,6 +54,11 @@ describe("item-editor", () => {
         .toEqual(1)
       expect(wrapper.find('[type="date"]').length)
         .toEqual(1)
+    })
+
+    it("calls the addItem handler with the update item state", () => {
+      wrapper.find('#saveBtn').simulate('click')
+      expect(addItemSpy).toHaveBeenCalled()
     })
   })
 })

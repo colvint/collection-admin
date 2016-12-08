@@ -4,11 +4,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import ReactTU from 'react-addons-test-utils'
 import Sorter from '../src/sorter.js'
-import sinon from 'sinon'
 
 describe('sorter', () => {
   let component
-  const onSortSpy = sinon.spy()
+  const onSortSpy = jest.fn()
 
   beforeEach(() => {
     component = ReactTU.renderIntoDocument(
@@ -23,16 +22,16 @@ describe('sorter', () => {
     // toggles to ascending
     component.toggleSort()
     expect(component.state.direction).toEqual(1)
-    expect(onSortSpy.calledWith({firstName: 1})).toBeTruthy()
+    expect(onSortSpy).toHaveBeenCalledWith({firstName: 1})
 
     // then toggles to descending
     component.toggleSort()
     expect(component.state.direction).toEqual(-1)
-    expect(onSortSpy.calledWith({firstName: -1})).toBeTruthy()
+    expect(onSortSpy).toHaveBeenCalledWith({firstName: -1})
 
     // then toggles to back to unsorted
     component.toggleSort()
     expect(component.state.direction).toBeNull
-    expect(onSortSpy.calledWith({firstName: null})).toBeTruthy()
+    expect(onSortSpy).toHaveBeenCalledWith({firstName: null})
   })
 })

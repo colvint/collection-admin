@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import update from 'react-addons-update'
 import { Button, ControlLabel, Form, FormControl, FormGroup, Modal } from 'react-bootstrap'
 import _ from 'underscore'
 import { humanize, titleize } from 'underscore.string'
@@ -6,15 +7,14 @@ import { humanize, titleize } from 'underscore.string'
 export default class ItemEditor extends Component {
 
   constructor(props) {
-    super(props);
-    this.handleSubmit = this.handleSubmit.bind(this);
-  };
+    super(props)
+
+    this.state = { item: props.item }
+    this.handleSave = this.handleSave.bind(this)
+  }
 
   _formControlTypeFromFieldDef(fieldDef) {
     switch (fieldDef.type) {
-      case String:
-        return 'text'
-        break
       case Date:
         return 'date'
         break
@@ -23,12 +23,19 @@ export default class ItemEditor extends Component {
     }
   }
 
-  handleSubmit(e) {    
-    var ticker = document.getElementById("ticker").value;
-    var lastPrice = document.getElementById("lastPrice").value;
-    var id = new Date().getTime();;
-    var item = {_id: id, ticker: ticker , lastPrice: lastPrice};
-    this.props.onAddItem(item)
+  handleFieldChange(fieldKey, e) {
+    const updatedItem = update(this.state.item, { $merge: { [fieldKey]: e.target.value } })
+    this.setState({ item: updatedItem })
+  }
+
+  handleSave() {
+    if(this.props.isNew) {
+      this.props.addItem(this.state.item)
+    } else {
+      this.props.updateItem(this.state.item)
+    }
+
+    this.props.onHide()
   }
 
   render() {
@@ -41,19 +48,19 @@ export default class ItemEditor extends Component {
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form onSubmit={this.handleSubmit}>
+          <Form>
             {_.map(this.props.itemSchema, (fieldDef, field) => {
 
               const type = this._formControlTypeFromFieldDef(fieldDef)
               return (
                 <FormGroup key={field} controlId={field}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
-                  <FormControl autoFocus={field === firstField} type={type}/>
+                  <FormControl autoFocus={field === firstField} type={type} onChange={this.handleFieldChange.bind(this, field)}/>
                   <FormControl.Feedback />
                 </FormGroup>
               )
             })}
-            <Button onClick={this.handleSubmit}>Save</Button>
+            <Button id="saveBtn" onClick={this.handleSave}>Save</Button>
           </Form>
         </Modal.Body>
       </Modal>
