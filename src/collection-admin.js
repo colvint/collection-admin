@@ -17,7 +17,7 @@ export default class CollectionAdmin extends React.Component {
       selectedItemIds: [],
       itemFilter: {},
       fetchOptions: {sort: {}},
-      newItemIsOpen: false,
+      itemEditorIsOpen: false,
       editingItemId: null,
       item: {}
     }
@@ -103,15 +103,15 @@ export default class CollectionAdmin extends React.Component {
   }
 
   newItem() {
-    this.setState({editingItemId: null, newItemIsOpen: true, item: {}})
+    this.setState({editingItemId: null, itemEditorIsOpen: true, item: {}})
   }
 
   closeNewItem() {
-    this.setState({newItemIsOpen: false})
+    this.setState({itemEditorIsOpen: false})
   }
 
   editItem(item) {    
-    this.setState({editingItemId: item._id, newItemIsOpen: true, item: item})
+    this.setState({editingItemId: item._id, itemEditorIsOpen: true, item: item})
   }
 
   render() {
@@ -125,7 +125,7 @@ export default class CollectionAdmin extends React.Component {
           {...this.props}
           item = {this.state.item}
           isNew = {this.state.editingItemId ? false : true}
-          show={this.state.newItemIsOpen}
+          show={this.state.itemEditorIsOpen}
           onHide={this.closeNewItem} />
       </ButtonToolbar>
     )
