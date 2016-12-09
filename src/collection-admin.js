@@ -103,7 +103,7 @@ export default class CollectionAdmin extends React.Component {
   }
 
   newItem() {
-    this.setState({newItemIsOpen: true, item: {}})
+    this.setState({editingItemId: null, newItemIsOpen: true, item: {}})
   }
 
   closeNewItem() {

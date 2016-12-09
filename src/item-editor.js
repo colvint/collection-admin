@@ -6,10 +6,13 @@ import { humanize, titleize } from 'underscore.string'
 
 export default class ItemEditor extends Component {
 
-  constructor(props) {    
-    super(props)
-    this.state = { item: props.item }
+  constructor(props) {
+    super(props)    
     this.handleSave = this.handleSave.bind(this)
+  }
+
+  componentWillReceiveProps(nextProps){
+    this.state = { item: nextProps.item }
   }
 
   _formControlTypeFromFieldDef(fieldDef) {
@@ -30,14 +33,8 @@ export default class ItemEditor extends Component {
   handleSave() {
     if(this.props.isNew) {
       this.props.addItem(this.state.item)
-    } else {
-      var updatedItem = {
-        _id: this.props.item._id,
-        ticker: this.state.item.ticker || this.props.item.ticker || '',
-        lastPrice: this.state.item.lastPrice || this.props.item.lastPrice || '',
-        dateOfIPO: this.state.item.dateOfIPO || this.props.item.dateOfIPO || ''
-      }
-      this.props.updateItem(this.props.item, updatedItem)
+    } else {      
+      this.props.updateItem(this.props.item, this.state.item)
     }
 
     this.props.onHide()
