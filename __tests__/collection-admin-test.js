@@ -108,8 +108,8 @@ describe('collection admin', () => {
   })
 
   it('opens the new item modal', () => {
-    expect(component.state.newItemIsOpen).toBeFalsy()
+    expect(component.state.itemEditorIsOpen).toBeFalsy()
     component.newItem()
-    expect(component.state.newItemIsOpen).toBeTruthy()
+    expect(component.state.itemEditorIsOpen).toBeTruthy()
   })
 })
