@@ -19,7 +19,7 @@ export default class ItemEditor extends Component {
     switch (fieldDef.type) {
       case Date:
         return 'date'
-        break
+        break      
       default:
         return 'text'
     }
@@ -53,9 +53,9 @@ export default class ItemEditor extends Component {
             {_.map(this.props.itemSchema, (fieldDef, field) => {              
               const type = this._formControlTypeFromFieldDef(fieldDef)
               return (
-                <FormGroup key={field} controlId={field}>
+                <FormGroup key={field} controlId={field} className={field != 'isArchive' ? '' : 'hidden'}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
-                  <FormControl autoFocus={field === firstField} type={type} onChange={this.handleFieldChange.bind(this, field)} defaultValue={this.props.item[field]} />
+                  <FormControl autoFocus={field === firstField} type={field != 'isArchive' ? type : 'hidden'} onChange={this.handleFieldChange.bind(this, field)} defaultValue={this.props.item[field]} />
                   <FormControl.Feedback />
                 </FormGroup>
               )

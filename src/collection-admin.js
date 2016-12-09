@@ -19,7 +19,8 @@ export default class CollectionAdmin extends React.Component {
       fetchOptions: {sort: {}},
       itemEditorIsOpen: false,
       editingItemId: null,
-      item: {}
+      item: { isArchive: false },
+      items: this.props.fetchItems()
     }
 
     this.isItemSelected = this.isItemSelected.bind(this)
@@ -103,7 +104,7 @@ export default class CollectionAdmin extends React.Component {
   }
 
   newItem() {
-    this.setState({editingItemId: null, itemEditorIsOpen: true, item: {}})
+    this.setState({editingItemId: null, itemEditorIsOpen: true, item: {isArchive: false}})
   }
 
   closeNewItem() {
@@ -112,6 +113,13 @@ export default class CollectionAdmin extends React.Component {
 
   editItem(item) {    
     this.setState({editingItemId: item._id, itemEditorIsOpen: true, item: item})
+  }
+
+  deleteItem(item) {    
+    var index = this.filteredAndSortedItems().indexOf(item);
+    item.isArchive = true
+    this.filteredAndSortedItems().splice(index, 1, item);
+    this.setState({items: this.filteredAndSortedItems()})    
   }
 
   render() {
@@ -156,28 +164,31 @@ export default class CollectionAdmin extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {_.map(items, (item, i) => {              
-              return (
-                <tr className="item" key={i}>
-                  <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
-                    <Checkbox
-                      className="itemSelector"
-                      checked={this.isItemSelected(item._id)}
-                      onChange={this.onItemSelected.bind(this, item._id)}
-                    />
-                  </td>
-                  {_.map(columns, (column, j) => {
-                    return (
-                      <td style={{verticalAlign: "middle"}} key={j} className={column}>
-                        {item[column]}
-                      </td>
-                    )
-                  })}
-                  <td>
-                    <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
-                  </td>
-                </tr>
-              )
+            {_.map(items, (item, i) => {
+              if (!item.isArchive) {
+                return (
+                  <tr className="item" key={i}>
+                    <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
+                      <Checkbox
+                        className="itemSelector"
+                        checked={this.isItemSelected(item._id)}
+                        onChange={this.onItemSelected.bind(this, item._id)}
+                      />
+                    </td>
+                    {_.map(columns, (column, j) => {
+                      return (
+                        <td style={{verticalAlign: "middle"}} key={j} className={column}>
+                          {item[column]}
+                        </td>
+                      )
+                    })}
+                    <td>
+                      <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
+                      <Button onClick={this.deleteItem.bind(this, item)}>Delete</Button>
+                    </td>
+                  </tr>
+                )
+              }
             })}
           </tbody>
         </Table>

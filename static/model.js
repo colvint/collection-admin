@@ -10,6 +10,9 @@ const itemSchema = {
   },
   dateOfIPO: {
     type: Date,
+  },
+  isArchive: {
+    type: Boolean
   }
 }
 
@@ -38,8 +41,8 @@ const fetchItems = (selector = {}, fetchOptions = {}) => {
   }
 }
 
-addItem({ ticker: 'GOOG', lastPrice: 312.35 })
-addItem({ ticker: 'AAPL', lastPrice: 4.33 })
-addItem({ ticker: 'FB', lastPrice: 38.11 })
+addItem({ ticker: 'GOOG', lastPrice: 312.35, isArchive: false })
+addItem({ ticker: 'AAPL', lastPrice: 4.33, isArchive: false })
+addItem({ ticker: 'FB', lastPrice: 38.11, isArchive: false })
 
 export { fetchItems as default, addItem, itemSchema, updateItem}
