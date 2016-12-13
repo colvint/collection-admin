@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {Button, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
+import {Button, ButtonGroup, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
 
@@ -114,7 +114,7 @@ export default class CollectionAdmin extends React.Component {
     this.setState({itemEditorIsOpen: false})
   }
 
-  editItem(item) {    
+  editItem(item) {
     this.setState({editingItemId: item._id, itemEditorIsOpen: true, item: item})
   }
 
@@ -130,7 +130,7 @@ export default class CollectionAdmin extends React.Component {
     var index = this.filteredAndSortedItems().indexOf(item);
     item.isArchive = true
     this.filteredAndSortedItems().splice(index, 1, item);
-    this.setState({items: this.filteredAndSortedItems()})    
+    this.setState({items: this.filteredAndSortedItems()})
   }
 
   undoItem( item ){
@@ -204,9 +204,11 @@ export default class CollectionAdmin extends React.Component {
                       )
                     })}
                     <td>
-                      <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
-                      <Button onClick={this.deleteItem.bind(this, item)}>Delete</Button>
-                      { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
+                      <ButtonGroup>
+                        <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
+                        <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button>
+                        { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
+                      </ButtonGroup>
                     </td>
                   </tr>
                 )
@@ -219,7 +221,7 @@ export default class CollectionAdmin extends React.Component {
   }
 }
 
-CollectionAdmin.propTypes = {  
+CollectionAdmin.propTypes = {
   loading: React.PropTypes.bool,
   itemType: React.PropTypes.string.isRequired,
   itemSchema: React.PropTypes.object.isRequired,
