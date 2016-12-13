@@ -1,13 +1,21 @@
 import React, { Component } from 'react'
 import update from 'react-addons-update'
-import { Button, ControlLabel, Form, FormControl, FormGroup, Modal } from 'react-bootstrap'
+import {
+  Button,
+  ControlLabel,
+  Form,
+  FormControl,
+  FormGroup,
+  HelpBlock,
+  Modal
+} from 'react-bootstrap'
 import _ from 'underscore'
 import { humanize, titleize } from 'underscore.string'
 
 export default class ItemEditor extends Component {
 
   constructor(props) {
-    super(props)    
+    super(props)
     this.handleSave = this.handleSave.bind(this)
   }
 
@@ -19,7 +27,7 @@ export default class ItemEditor extends Component {
     switch (fieldDef.type) {
       case Date:
         return 'date'
-        break      
+        break
       default:
         return 'text'
     }
@@ -33,7 +41,7 @@ export default class ItemEditor extends Component {
   handleSave() {
     if(this.props.isNew) {
       this.props.addItem(this.state.item)
-    } else {      
+    } else {
       this.props.updateItem(this.props.item, this.state.item)
     }
 
@@ -43,20 +51,32 @@ export default class ItemEditor extends Component {
   render() {
     const title = titleize(`${this.props.isNew ? 'New' : 'Editing'} ${this.props.itemType}`)
     const firstField = Object.keys(this.props.itemSchema)[0]
-    return (      
+
+    return (
       <Modal show={this.props.show} onHide={this.props.onHide}>
         <Modal.Header>
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
-            {_.map(this.props.itemSchema, (fieldDef, field) => {              
+            {_.map(this.props.itemSchema, (fieldDef, field) => {
               const type = this._formControlTypeFromFieldDef(fieldDef)
+              const fieldError = this.props.validator.fieldError(field, this.state.item)
+              let validationState
+              let validationMessage
+
+              if (fieldError) {
+                validationState = 'error'
+                validationMessage = (<HelpBlock>{fieldError}</HelpBlock>)
+              } else {
+                validationState = 'success'
+              }
+
               return (
-                <FormGroup key={field} controlId={field} className={field != 'isArchive' ? '' : 'hidden'}>
+                <FormGroup key={field} controlId={field} className={field != 'isArchive' ? '' : 'hidden'} validationState={validationState}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
                   <FormControl autoFocus={field === firstField} type={field != 'isArchive' ? type : 'hidden'} onChange={this.handleFieldChange.bind(this, field)} defaultValue={this.props.item[field]} />
-                  <FormControl.Feedback />
+                  {validationMessage}
                 </FormGroup>
               )
             })}
@@ -70,14 +90,14 @@ export default class ItemEditor extends Component {
 
 ItemEditor.propTypes = {
   item: React.PropTypes.object,
-  itemValidator: React.PropTypes.shape({
-    validationMessage: React.PropTypes.func.isRequired,
-    isItemValid: React.PropTypes.func.isRequired,
-    isFieldValue: React.PropTypes.func.isRequired,
-  }),
-  isNew: React.PropTypes.bool.isRequired,
-  show: React.PropTypes.bool.isRequired,
+  validator: React.PropTypes.object,
+  isNew: React.PropTypes.bool,
+  show: React.PropTypes.bool,
+  itemType: React.PropTypes.string.isRequired,
+  itemSchema: React.PropTypes.object.isRequired,
   onHide: React.PropTypes.func.isRequired,
+  addItem: React.PropTypes.func.isRequired,
+  updateItem: React.PropTypes.func.isRequired,
 }
 
 ItemEditor.defaultProps = {

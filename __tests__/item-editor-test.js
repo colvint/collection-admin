@@ -29,7 +29,6 @@ describe("item-editor", () => {
         <ItemEditor
           show
           isNew
-          item={{}}
           itemType="person"
           itemSchema={itemSchema}
           onHide={onHideSpy}
