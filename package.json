@@ -45,6 +45,7 @@
     "react-bootstrap": "latest",
     "react-dom": "latest",
     "react-router": "latest",
+    "simpl-schema": "0.0.3",
     "underscore": "latest",
     "underscore.string": "latest",
     "uuid": "^3.0.1"
