@@ -28,6 +28,20 @@ const updateItem = (oldItem, updatedItem) => {
   items.splice(index, 1, updatedItem);
 }
 
+const deleteItem = (item) => {
+  var index = items.indexOf(item);
+  item.isArchive = true  
+  items.splice(index, 1, item);
+  return items;  
+}
+
+const undoItem = (item) => {
+  var index = items.indexOf(item);
+  item.isArchive = false
+  items.splice(index, 1, item);
+  return items;
+}
+
 const fetchItems = (selector = {}, fetchOptions = {}) => {
   const sortKey = _.first(_.keys(fetchOptions.sort))
 
@@ -45,4 +59,4 @@ addItem({ ticker: 'GOOG', lastPrice: 312.35, isArchive: false })
 addItem({ ticker: 'AAPL', lastPrice: 4.33, isArchive: false })
 addItem({ ticker: 'FB', lastPrice: 38.11, isArchive: false })
 
-export { fetchItems as default, addItem, itemSchema, updateItem}
+export { fetchItems as default, addItem, itemSchema, updateItem, deleteItem, undoItem}

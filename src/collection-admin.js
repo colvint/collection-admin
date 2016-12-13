@@ -127,17 +127,13 @@ export default class CollectionAdmin extends React.Component {
   }
 
   deleteItem(item) {
-    var index = this.filteredAndSortedItems().indexOf(item);
-    item.isArchive = true
-    this.filteredAndSortedItems().splice(index, 1, item);
-    this.setState({items: this.filteredAndSortedItems()})
+    var items = this.props.deleteItem(item)   
+    this.setState({ items: items })
   }
 
   undoItem( item ){
-    var index = this.filteredAndSortedItems().indexOf(item);
-    item.isArchive = false
-    this.filteredAndSortedItems().splice(index, 1, item);
-    this.setState({items: this.filteredAndSortedItems()})    
+    var items = this.props.undoItem(item)   
+    this.setState({ items: items })   
   }
 
   render() {
@@ -206,7 +202,7 @@ export default class CollectionAdmin extends React.Component {
                     <td>
                       <ButtonGroup>
                         <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
-                        <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button>
+                        { !archive ? <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button> : ''}                        
                         { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
                       </ButtonGroup>
                     </td>
@@ -227,5 +223,7 @@ CollectionAdmin.propTypes = {
   itemSchema: React.PropTypes.object.isRequired,
   fetchItems: React.PropTypes.func.isRequired,
   addItem: React.PropTypes.func.isRequired,
-  updateItem: React.PropTypes.func.isRequired
+  updateItem: React.PropTypes.func.isRequired,
+  deleteItem: React.PropTypes.func.isRequired,
+  undoItem: React.PropTypes.func.isRequired
 }
