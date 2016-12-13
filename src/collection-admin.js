@@ -20,7 +20,8 @@ export default class CollectionAdmin extends React.Component {
       itemEditorIsOpen: false,
       editingItemId: null,
       item: { isArchive: false },
-      items: this.props.fetchItems()
+      items: this.props.fetchItems(),
+      archiveItem: false
     }
 
     this.isItemSelected = this.isItemSelected.bind(this)
@@ -29,6 +30,8 @@ export default class CollectionAdmin extends React.Component {
     this.onFilter = this.onFilter.bind(this)
     this.newItem = this.newItem.bind(this)
     this.closeNewItem = this.closeNewItem.bind(this)
+    this.archiveItem = this.archiveItem.bind(this)
+    this.indexItem = this.indexItem.bind(this)
   }
 
   onItemSelected(itemId) {
@@ -115,6 +118,14 @@ export default class CollectionAdmin extends React.Component {
     this.setState({editingItemId: item._id, itemEditorIsOpen: true, item: item})
   }
 
+  archiveItem() {
+   this.setState({ archiveItem: true }) 
+  }
+
+  indexItem() {
+   this.setState({ archiveItem: false }) 
+  }
+
   deleteItem(item) {
     var index = this.filteredAndSortedItems().indexOf(item);
     item.isArchive = true
@@ -122,13 +133,23 @@ export default class CollectionAdmin extends React.Component {
     this.setState({items: this.filteredAndSortedItems()})
   }
 
+  undoItem( item ){
+    var index = this.filteredAndSortedItems().indexOf(item);
+    item.isArchive = false
+    this.filteredAndSortedItems().splice(index, 1, item);
+    this.setState({items: this.filteredAndSortedItems()})    
+  }
+
   render() {
     const items = this.filteredAndSortedItems()
     const itemIds = _.pluck(items, '_id')
     const columns = this.columns()
+    const archive = this.state.archiveItem ? true : false
     const controls = (
       <ButtonToolbar>
         <Button onClick={this.newItem}>New</Button>
+        <Button onClick={this.indexItem}>Index</Button>
+        <Button onClick={this.archiveItem}>Archive</Button>
         <ItemEditor
           {...this.props}
           item = {this.state.item}
@@ -138,8 +159,8 @@ export default class CollectionAdmin extends React.Component {
       </ButtonToolbar>
     )
 
-    return (
-      <Panel header={controls}>
+    return (     
+      <Panel header={controls}>        
         <Table className="table table-bordered table-striped table-hover">
           <thead>
             <tr>
@@ -163,9 +184,9 @@ export default class CollectionAdmin extends React.Component {
               <th></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody>            
             {_.map(items, (item, i) => {
-              if (!item.isArchive) {
+              if (item.isArchive == archive) {
                 return (
                   <tr className="item" key={i}>
                     <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
@@ -186,6 +207,7 @@ export default class CollectionAdmin extends React.Component {
                       <ButtonGroup>
                         <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
                         <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button>
+                        { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
                       </ButtonGroup>
                     </td>
                   </tr>
