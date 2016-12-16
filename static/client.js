@@ -1,6 +1,6 @@
 import React from "react"
 import { render } from "react-dom"
-import fetchItems, { itemSchema, addItem, updateItem} from "./model"
+import fetchItems, { itemSchema, addItem, updateItem, deleteItem, undoItem} from "./model"
 import CollectionAdmin from "../src/collection-admin"
 import Validator from "../src/validators/simple-schema"
 
@@ -14,6 +14,8 @@ render(
     addItem={addItem}
     updateItem={updateItem}
     validator={validator}
+    deleteItem = {deleteItem}
+    undoItem= {undoItem}
   />,
   document.getElementById("app")
 )

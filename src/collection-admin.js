@@ -86,7 +86,7 @@ export default class CollectionAdmin extends React.Component {
     } else {
       sort = ReactUpdate(sort, {$merge: sortSpecifier})
     }
-
+    // sort = Object {lastPrice: 1}
     const fetchOptions = ReactUpdate(this.state.fetchOptions, {$merge: {sort: sort}})
 
     this.setState({fetchOptions: fetchOptions})
@@ -97,14 +97,15 @@ export default class CollectionAdmin extends React.Component {
     const conditionType = _.keys(conditionSpecifier[field])[0]
     const conditionEnabled = conditionSpecifier[field][conditionType]
     let itemFilter = this.state.itemFilter
-    let condition
-
-    if (conditionEnabled) {
-      condition = new Condition(field, conditionSpecifier[field].value)
-      itemFilter = ReactUpdate(itemFilter, {$merge: condition[conditionType]()})
-    } else{
+    if (conditionEnabled){
+      if (conditionType != "textContains"){
+        itemFilter[field] =  conditionSpecifier[field]  
+      }else if(Object.keys(conditionSpecifier[field]).length != 1){
+        itemFilter[field] =  conditionSpecifier[field]
+      }
+    }else{         
       delete itemFilter[field]
-    }
+    }     
     this.setState({itemFilter: itemFilter})
   }
 
@@ -129,17 +130,13 @@ export default class CollectionAdmin extends React.Component {
   }
 
   deleteItem(item) {
-    var index = this.filteredAndSortedItems().indexOf(item);
-    item.isArchive = true
-    this.filteredAndSortedItems().splice(index, 1, item);
-    this.setState({items: this.filteredAndSortedItems()})
+    var items = this.props.deleteItem(item)   
+    this.setState({ items: items })
   }
 
   undoItem(item) {
-    var index = this.filteredAndSortedItems().indexOf(item);
-    item.isArchive = false
-    this.filteredAndSortedItems().splice(index, 1, item);
-    this.setState({items: this.filteredAndSortedItems()})    
+    var items = this.props.undoItem(item)   
+    this.setState({ items: items })   
   }
 
   _renderField(fieldKey, item) {
@@ -222,7 +219,7 @@ export default class CollectionAdmin extends React.Component {
                     <td>
                       <ButtonGroup>
                         <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
-                        <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button>
+                        { !archive ? <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button> : ''}                        
                         { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
                       </ButtonGroup>
                     </td>
@@ -243,5 +240,7 @@ CollectionAdmin.propTypes = {
   itemSchema: React.PropTypes.object.isRequired,
   fetchItems: React.PropTypes.func.isRequired,
   addItem: React.PropTypes.func.isRequired,
-  updateItem: React.PropTypes.func.isRequired
+  updateItem: React.PropTypes.func.isRequired,
+  deleteItem: React.PropTypes.func.isRequired,
+  undoItem: React.PropTypes.func.isRequired
 }
