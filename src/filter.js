@@ -61,6 +61,7 @@ export default class Filter extends React.Component {
         <DropdownButton
           id={`${this.props.field}FilterMenu`}
           bsSize="small"
+          className="columnFilter"
           noCaret
           style={{marginLeft: 10}}
           title={<span className="fa fa-filter" style={{color: color}} />}>

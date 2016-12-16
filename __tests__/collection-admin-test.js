@@ -3,44 +3,50 @@ jest.unmock('../src/conditions/meteor')
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ReactTU from 'react-addons-test-utils'
+import { shallow } from 'enzyme'
 import _ from 'underscore'
-
 import createPeople from '../test-fixtures/people'
-
 import CollectionAdmin from '../src/collection-admin'
+
+const itemSchema = {
+  firstName: {
+    type: String,
+  },
+  lastName: {
+    type: String,
+  },
+  age: {
+    type: Number,
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  isEmployed: {
+    type: Boolean
+  }
+}
 
 describe('collection admin', () => {
   const items = createPeople(3)
   const allItemIds = _.pluck(items, '_id')
-  const itemSchema = {
-    firstName: {
-      type: String,
-    },
-    lastName: {
-      type: String,
-    },
-    age: {
-      type: String,
-    }
-  }
   const addItemSpy = jest.fn()
   const updateItemSpy = jest.fn()
 
-  let component
+  let wrapper, component
   let fetchItems = jest.fn(() => items)
 
   beforeEach(() => {
-    component = ReactTU.renderIntoDocument(
+    wrapper = shallow(
       <CollectionAdmin
-        itemType="stock"
+        itemType="person"
         fetchItems={fetchItems}
         itemSchema={itemSchema}
         addItem={addItemSpy}
         updateItem={updateItemSpy}
       />
     )
-    component.setState({selectedItemIds: []})
+    wrapper.setState({selectedItemIds: [], archiveItem: false})
+    component = wrapper.instance()
   })
 
   it('lists all items', () => {
@@ -48,29 +54,31 @@ describe('collection admin', () => {
   })
 
   it('reads columns from the item schema', () => {
-    expect(component.columns()).toEqual(['firstName', 'lastName', 'age'])
+    expect(component.columns()).toEqual(['firstName', 'lastName', 'age', 'dateOfBirth', 'isEmployed'])
   })
 
   it('displays the item data', () => {
-    const firstNames = ReactTU.scryRenderedDOMComponentsWithClass(component, 'firstName')
-    const lastNames = ReactTU.scryRenderedDOMComponentsWithClass(component, 'lastName')
-    const ages = ReactTU.scryRenderedDOMComponentsWithClass(component, 'age')
+    const firstNames = wrapper.find('.firstName')
+    const lastNames = wrapper.find('.lastName')
+    const ages = wrapper.find('.age')
 
-    expect(firstNames[0].textContent).toEqual(items[0].firstName)
-    expect(lastNames[0].textContent).toEqual(items[0].lastName)
-    expect(ages[0].textContent).toEqual(`${items[0].age}`)
+    expect(firstNames.at(0).text()).toEqual(items[0].firstName)
+    expect(lastNames.at(0).text()).toEqual(items[0].lastName)
+    expect(ages.at(0).text()).toEqual(`${items[0].age}`)
   })
 
-  it('displays the column headers', () => {
-    expect(component.refs.firstNameSorter.props.children).toEqual('First name')
-    expect(component.refs.lastNameSorter.props.children).toEqual('Last name')
-    expect(component.refs.ageSorter.props.children).toEqual('Age')
+  it('displays the column sorter and filters', () => {
+    const sorters = wrapper.find('Sorter')
+    const filters = wrapper.find('Filter')
+
+    expect(sorters).toHaveLength(5)
+    expect(filters).toHaveLength(5)
   })
 
   it('selects individual items', () => {
-    const itemSelectors = ReactTU.scryRenderedDOMComponentsWithClass(component, 'itemSelector')
+    const itemSelectors = wrapper.find('Checkbox')
 
-    expect(itemSelectors.length).toEqual(3)
+    expect(itemSelectors).toHaveLength(3)
     expect(component.state.selectedItemIds).toEqual([])
     component.onItemSelected(allItemIds[0])
     expect(component.state.selectedItemIds).toContain(allItemIds[0])
@@ -85,11 +93,6 @@ describe('collection admin', () => {
   })
 
   it('filters items', () => {
-    // expect there to be one filter per field
-    expect(component.refs.firstNameFilter).not.toBeUndefined()
-    expect(component.refs.lastNameFilter).not.toBeUndefined()
-    expect(component.refs.ageFilter).not.toBeUndefined()
-
     expect(component.state.itemFilter).toEqual({})
     component.onFilter({firstName: {isEmpty: true}})
     expect(component.state.itemFilter).toEqual({firstName: {$exists: false}})
@@ -108,8 +111,8 @@ describe('collection admin', () => {
   })
 
   it('opens the new item modal', () => {
-    expect(component.state.newItemIsOpen).toBeFalsy()
+    expect(component.state.itemEditorIsOpen).toBeFalsy()
     component.newItem()
-    expect(component.state.newItemIsOpen).toBeTruthy()
+    expect(component.state.itemEditorIsOpen).toBeTruthy()
   })
 })

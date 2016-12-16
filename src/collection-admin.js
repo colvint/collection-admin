@@ -1,8 +1,10 @@
 import React from 'react'
 import ReactUpdate from 'react-addons-update'
-import {Button, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
+import {Button, ButtonGroup, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
+import moment from 'moment'
+import FontAwesome from 'react-fontawesome'
 
 import GroupSelector from './group-selector'
 import Sorter from './sorter'
@@ -13,13 +15,15 @@ import ItemEditor from './item-editor'
 export default class CollectionAdmin extends React.Component {
   constructor(props) {
     super(props)
-
     this.state = {
       selectedItemIds: [],
       itemFilter: {},
       fetchOptions: {sort: {}},
-      newItemIsOpen: false,
+      itemEditorIsOpen: false,
       editingItemId: null,
+      item: { isArchive: false },
+      items: this.props.fetchItems(),
+      archiveItem: false
     }
 
     this.isItemSelected = this.isItemSelected.bind(this)
@@ -28,6 +32,8 @@ export default class CollectionAdmin extends React.Component {
     this.onFilter = this.onFilter.bind(this)
     this.newItem = this.newItem.bind(this)
     this.closeNewItem = this.closeNewItem.bind(this)
+    this.archiveItem = this.archiveItem.bind(this)
+    this.indexItem = this.indexItem.bind(this)
   }
 
   onItemSelected(itemId) {
@@ -80,7 +86,7 @@ export default class CollectionAdmin extends React.Component {
     } else {
       sort = ReactUpdate(sort, {$merge: sortSpecifier})
     }
-
+    // sort = Object {lastPrice: 1}
     const fetchOptions = ReactUpdate(this.state.fetchOptions, {$merge: {sort: sort}})
 
     this.setState({fetchOptions: fetchOptions})
@@ -91,46 +97,85 @@ export default class CollectionAdmin extends React.Component {
     const conditionType = _.keys(conditionSpecifier[field])[0]
     const conditionEnabled = conditionSpecifier[field][conditionType]
     let itemFilter = this.state.itemFilter
-    let condition
-
-    if (conditionEnabled) {
-      condition = new Condition(field, conditionSpecifier[field].value)
-      itemFilter = ReactUpdate(itemFilter, {$merge: condition[conditionType]()})
-    } else{
+    if (conditionEnabled){
+      if (conditionType != "textContains"){
+        itemFilter[field] =  conditionSpecifier[field]  
+      }else if(Object.keys(conditionSpecifier[field]).length != 1){
+        itemFilter[field] =  conditionSpecifier[field]
+      }
+    }else{         
       delete itemFilter[field]
-    }
+    }     
     this.setState({itemFilter: itemFilter})
   }
 
   newItem() {
-    this.setState({newItemIsOpen: true})
+    this.setState({editingItemId: null, itemEditorIsOpen: true, item: {isArchive: false}})
   }
 
   closeNewItem() {
-    this.setState({newItemIsOpen: false})
+    this.setState({itemEditorIsOpen: false})
   }
 
-  editItem(itemId) {
-    this.setState({editingItemId: itemId})
+  editItem(item) {
+    this.setState({editingItemId: item._id, itemEditorIsOpen: true, item: item})
+  }
+
+  archiveItem() {
+   this.setState({ archiveItem: true }) 
+  }
+
+  indexItem() {
+   this.setState({ archiveItem: false }) 
+  }
+
+  deleteItem(item) {
+    var items = this.props.deleteItem(item)   
+    this.setState({ items: items })
+  }
+
+  undoItem(item) {
+    var items = this.props.undoItem(item)   
+    this.setState({ items: items })   
+  }
+
+  _renderField(fieldKey, item) {
+    const fieldValue = item[fieldKey]
+    const fieldDef = this.props.itemSchema[fieldKey]
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return fieldValue ? (<FontAwesome name="check" />) : null
+      case Number:
+        return fieldValue
+      case Date:
+        return moment(fieldValue).format('L')
+      default:
+        return fieldValue
+    }
   }
 
   render() {
     const items = this.filteredAndSortedItems()
     const itemIds = _.pluck(items, '_id')
     const columns = this.columns()
+    const archive = this.state.archiveItem ? true : false
     const controls = (
       <ButtonToolbar>
         <Button onClick={this.newItem}>New</Button>
+        <Button onClick={this.indexItem}>Index</Button>
+        <Button onClick={this.archiveItem}>Archive</Button>
         <ItemEditor
           {...this.props}
-          isNew
-          show={this.state.newItemIsOpen}
+          item = {this.state.item}
+          isNew = {this.state.editingItemId ? false : true}
+          show={this.state.itemEditorIsOpen}
           onHide={this.closeNewItem} />
       </ButtonToolbar>
     )
 
-    return (
-      <Panel header={controls}>
+    return (     
+      <Panel header={controls}>        
         <Table className="table table-bordered table-striped table-hover">
           <thead>
             <tr>
@@ -144,39 +189,43 @@ export default class CollectionAdmin extends React.Component {
               {_.map(columns, (column, i) => {
                 return (
                   <th key={i}>
-                    <Sorter ref={`${column}Sorter`} field={column} onSort={this.onSort}>
-                      {humanize(column)}
-                    </Sorter>
-                    <Filter ref={`${column}Filter`} field={column} onFilter={this.onFilter}/>
+                    <Sorter field={column} onSort={this.onSort}>{humanize(column)}</Sorter>
+                    <Filter field={column} onFilter={this.onFilter}/>
                   </th>
                 )
               })}
               <th></th>
             </tr>
           </thead>
-          <tbody>
+          <tbody>            
             {_.map(items, (item, i) => {
-              return (
-                <tr className="item" key={i}>
-                  <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
-                    <Checkbox
-                      className="itemSelector"
-                      checked={this.isItemSelected(item._id)}
-                      onChange={this.onItemSelected.bind(this, item._id)}
-                    />
-                  </td>
-                  {_.map(columns, (column, j) => {
-                    return (
-                      <td style={{verticalAlign: "middle"}} key={j} className={column}>
-                        {item[column]}
-                      </td>
-                    )
-                  })}
-                  <td>
-                    <Button onClick={this.editItem.bind(this, item._id)}>Edit</Button>
-                  </td>
-                </tr>
-              )
+              if (item.isArchive == archive) {
+                return (
+                  <tr className="item" key={i}>
+                    <td style={{width: 25, verticalAlign: "middle", textAlign: "center"}}>
+                      <Checkbox
+                        className="itemSelector"
+                        checked={this.isItemSelected(item._id)}
+                        onChange={this.onItemSelected.bind(this, item._id)}
+                      />
+                    </td>
+                    {_.map(columns, (column, j) => {
+                      return (
+                        <td style={{verticalAlign: "middle"}} key={j} className={column}>
+                          {this._renderField(column, item)}
+                        </td>
+                      )
+                    })}
+                    <td>
+                      <ButtonGroup>
+                        <Button onClick={this.editItem.bind(this, item)}>Edit</Button>
+                        { !archive ? <Button onClick={this.deleteItem.bind(this, item)} bsStyle="danger">Delete</Button> : ''}                        
+                        { archive ? <Button onClick={this.undoItem.bind(this, item)}>Undo</Button> : ''}
+                      </ButtonGroup>
+                    </td>
+                  </tr>
+                )
+              }
             })}
           </tbody>
         </Table>
@@ -192,4 +241,6 @@ CollectionAdmin.propTypes = {
   fetchItems: React.PropTypes.func.isRequired,
   addItem: React.PropTypes.func.isRequired,
   updateItem: React.PropTypes.func.isRequired,
+  deleteItem: React.PropTypes.func.isRequired,
+  undoItem: React.PropTypes.func.isRequired
 }

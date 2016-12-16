@@ -5,6 +5,7 @@ import Validator from '../../src/validators/simple-schema'
 const itemSchema = {
   firstName: {
     type: String,
+    min: 2,
   },
   dateOfBirth: {
     type: Date,
@@ -19,9 +20,16 @@ describe('simple schema validator', () => {
     validator = new Validator(itemSchema)
   });
 
-  it("validates an individual field against the schema", () => {
-    expect(validator.isFieldValid('firstName', item, itemSchema)).toBeFalsy()
+  it("validates an individual field", () => {
+    expect(validator.fieldError('firstName', item)).toBe('First name is required')
     item.firstName = 'Willy'
-    expect(validator.isFieldValid('firstName', item, itemSchema)).toBeTruthy()
+    expect(validator.fieldError('firstName', item)).toBeFalsy()
+  })
+
+  it("validates an entire item", () => {
+    item.firstName = 'Willy'
+    expect(validator.isItemValid(item)).toBeFalsy()
+    item.dateOfBirth = new Date()
+    expect(validator.isItemValid(item)).toBeTruthy()
   })
 })

@@ -1,30 +1,62 @@
 import React, { Component } from 'react'
 import update from 'react-addons-update'
-import { Button, ControlLabel, Form, FormControl, FormGroup, Modal } from 'react-bootstrap'
+import { Button, Checkbox, ControlLabel, Form, FormControl, FormGroup, HelpBlock, Modal} from 'react-bootstrap'
 import _ from 'underscore'
 import { humanize, titleize } from 'underscore.string'
+import moment from 'moment'
 
 export default class ItemEditor extends Component {
 
   constructor(props) {
     super(props)
 
-    this.state = { item: props.item }
     this.handleSave = this.handleSave.bind(this)
-  }
+    this._formControlFromFieldKey = this._formControlFromFieldKey.bind(this)
 
-  _formControlTypeFromFieldDef(fieldDef) {
-    switch (fieldDef.type) {
-      case Date:
-        return 'date'
-        break
-      default:
-        return 'text'
+    this.state = {
+      item: props.item
     }
   }
 
+  _formControlFromFieldKey(fieldKey) {
+    const fieldDef = this.props.itemSchema[fieldKey]
+    const fieldValue = this.state.item[fieldKey]
+    const isFirstField = Object.keys(this.props.itemSchema)[0] === fieldKey
+    const controlProps = {
+      autoFocus: isFirstField,
+      onChange: this.handleFieldChange.bind(this, fieldKey),
+      placeholder: `Enter ${humanize(fieldKey)}`
+    }
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return (<Checkbox defaultChecked={fieldValue} {...controlProps} />)
+      case Date:
+        return (<FormControl type="date" defaultValue={moment(fieldValue).format('YYYY-MM-DD')} {...controlProps} />)
+      default:
+        return (<FormControl type="text" defaultValue={fieldValue} {...controlProps} />)
+    }
+  }
+
+  _valueFromInput(fieldKey, e) {
+    const fieldDef = this.props.itemSchema[fieldKey]
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return e.target.checked
+      case Number:
+        return parseFloat(e.target.value)
+      case Date:
+        return moment(e.target.value, 'YYYY-MM-DD').toDate()
+      default:
+        return e.target.value
+    }    
+  }
+
   handleFieldChange(fieldKey, e) {
-    const updatedItem = update(this.state.item, { $merge: { [fieldKey]: e.target.value } })
+    const value = this._valueFromInput(fieldKey, e)
+    const updatedItem = update(this.state.item, { $merge: { [fieldKey]: value } })
+
     this.setState({ item: updatedItem })
   }
 
@@ -32,7 +64,7 @@ export default class ItemEditor extends Component {
     if(this.props.isNew) {
       this.props.addItem(this.state.item)
     } else {
-      this.props.updateItem(this.state.item)
+      this.props.updateItem(this.props.item, this.state.item)
     }
 
     this.props.onHide()
@@ -40,7 +72,6 @@ export default class ItemEditor extends Component {
 
   render() {
     const title = titleize(`${this.props.isNew ? 'New' : 'Editing'} ${this.props.itemType}`)
-    const firstField = Object.keys(this.props.itemSchema)[0]
 
     return (
       <Modal show={this.props.show} onHide={this.props.onHide}>
@@ -50,13 +81,13 @@ export default class ItemEditor extends Component {
         <Modal.Body>
           <Form>
             {_.map(this.props.itemSchema, (fieldDef, field) => {
+              const fieldError = this.props.validator.fieldError(field, this.state.item)
 
-              const type = this._formControlTypeFromFieldDef(fieldDef)
               return (
-                <FormGroup key={field} controlId={field}>
+                <FormGroup key={field} controlId={field} validationState={fieldError ? 'error' : 'success'}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
-                  <FormControl autoFocus={field === firstField} type={type} onChange={this.handleFieldChange.bind(this, field)}/>
-                  <FormControl.Feedback />
+                  {this._formControlFromFieldKey(field)}
+                  {fieldError && <HelpBlock>{fieldError}</HelpBlock>}
                 </FormGroup>
               )
             })}
@@ -70,18 +101,22 @@ export default class ItemEditor extends Component {
 
 ItemEditor.propTypes = {
   item: React.PropTypes.object,
-  itemValidator: React.PropTypes.shape({
-    validationMessage: React.PropTypes.func.isRequired,
-    isItemValid: React.PropTypes.func.isRequired,
-    isFieldValue: React.PropTypes.func.isRequired,
-  }),
-  isNew: React.PropTypes.bool.isRequired,
-  show: React.PropTypes.bool.isRequired,
+  validator: React.PropTypes.object,
+  isNew: React.PropTypes.bool,
+  show: React.PropTypes.bool,
+  itemType: React.PropTypes.string.isRequired,
+  itemSchema: React.PropTypes.object.isRequired,
   onHide: React.PropTypes.func.isRequired,
+  addItem: React.PropTypes.func.isRequired,
+  updateItem: React.PropTypes.func.isRequired,
 }
 
 ItemEditor.defaultProps = {
   item: {},
   isNew: false,
   show: false,
+  validator: {
+    fieldError: () => false,
+    isItemValid: () => true
+  }
 }
