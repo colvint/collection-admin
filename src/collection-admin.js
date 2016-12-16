@@ -174,10 +174,8 @@ export default class CollectionAdmin extends React.Component {
               {_.map(columns, (column, i) => {
                 return (
                   <th key={i}>
-                    <Sorter ref={`${column}Sorter`} field={column} onSort={this.onSort}>
-                      {humanize(column)}
-                    </Sorter>
-                    <Filter ref={`${column}Filter`} field={column} onFilter={this.onFilter}/>
+                    <Sorter field={column} onSort={this.onSort}>{humanize(column)}</Sorter>
+                    <Filter field={column} onFilter={this.onFilter}/>
                   </th>
                 )
               })}

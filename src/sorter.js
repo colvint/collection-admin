@@ -36,7 +36,7 @@ export default class Sorter extends React.Component {
     }
 
     return (
-      <span style={{cursor: "pointer"}} onClick={this.toggleSort}>
+      <span style={{cursor: "pointer"}} onClick={this.toggleSort} className="column-sorter">
         <span className={classnames('fa', iconKlasses)} style={{marginRight: 5}} />
         {this.props.children}
       </span>
