@@ -16,7 +16,13 @@ const itemSchema = {
     type: String,
   },
   age: {
-    type: String,
+    type: Number,
+  },
+  dateOfBirth: {
+    type: Date
+  },
+  isEmployed: {
+    type: Boolean
   }
 }
 
@@ -48,7 +54,7 @@ describe('collection admin', () => {
   })
 
   it('reads columns from the item schema', () => {
-    expect(component.columns()).toEqual(['firstName', 'lastName', 'age'])
+    expect(component.columns()).toEqual(['firstName', 'lastName', 'age', 'dateOfBirth', 'isEmployed'])
   })
 
   it('displays the item data', () => {
@@ -65,8 +71,8 @@ describe('collection admin', () => {
     const sorters = wrapper.find('Sorter')
     const filters = wrapper.find('Filter')
 
-    expect(sorters).toHaveLength(3)
-    expect(filters).toHaveLength(3)
+    expect(sorters).toHaveLength(5)
+    expect(filters).toHaveLength(5)
   })
 
   it('selects individual items', () => {

@@ -1,40 +1,62 @@
 import React, { Component } from 'react'
 import update from 'react-addons-update'
-import {
-  Button,
-  ControlLabel,
-  Form,
-  FormControl,
-  FormGroup,
-  HelpBlock,
-  Modal
-} from 'react-bootstrap'
+import { Button, Checkbox, ControlLabel, Form, FormControl, FormGroup, HelpBlock, Modal} from 'react-bootstrap'
 import _ from 'underscore'
 import { humanize, titleize } from 'underscore.string'
+import moment from 'moment'
 
 export default class ItemEditor extends Component {
 
   constructor(props) {
     super(props)
+
     this.handleSave = this.handleSave.bind(this)
-  }
+    this._formControlFromFieldKey = this._formControlFromFieldKey.bind(this)
 
-  componentWillReceiveProps(nextProps){
-    this.state = { item: nextProps.item }
-  }
-
-  _formControlTypeFromFieldDef(fieldDef) {
-    switch (fieldDef.type) {
-      case Date:
-        return 'date'
-        break
-      default:
-        return 'text'
+    this.state = {
+      item: props.item
     }
   }
 
+  _formControlFromFieldKey(fieldKey) {
+    const fieldDef = this.props.itemSchema[fieldKey]
+    const fieldValue = this.state.item[fieldKey]
+    const isFirstField = Object.keys(this.props.itemSchema)[0] === fieldKey
+    const controlProps = {
+      autoFocus: isFirstField,
+      onChange: this.handleFieldChange.bind(this, fieldKey),
+      placeholder: `Enter ${humanize(fieldKey)}`
+    }
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return (<Checkbox defaultChecked={fieldValue} {...controlProps} />)
+      case Date:
+        return (<FormControl type="date" defaultValue={moment(fieldValue).format('YYYY-MM-DD')} {...controlProps} />)
+      default:
+        return (<FormControl type="text" defaultValue={fieldValue} {...controlProps} />)
+    }
+  }
+
+  _valueFromInput(fieldKey, e) {
+    const fieldDef = this.props.itemSchema[fieldKey]
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return e.target.checked
+      case Number:
+        return parseFloat(e.target.value)
+      case Date:
+        return moment(e.target.value, 'YYYY-MM-DD').toDate()
+      default:
+        return e.target.value
+    }    
+  }
+
   handleFieldChange(fieldKey, e) {
-    const updatedItem = update(this.state.item, { $merge: { [fieldKey]: e.target.value } })
+    const value = this._valueFromInput(fieldKey, e)
+    const updatedItem = update(this.state.item, { $merge: { [fieldKey]: value } })
+
     this.setState({ item: updatedItem })
   }
 
@@ -50,7 +72,6 @@ export default class ItemEditor extends Component {
 
   render() {
     const title = titleize(`${this.props.isNew ? 'New' : 'Editing'} ${this.props.itemType}`)
-    const firstField = Object.keys(this.props.itemSchema)[0]
 
     return (
       <Modal show={this.props.show} onHide={this.props.onHide}>
@@ -60,23 +81,13 @@ export default class ItemEditor extends Component {
         <Modal.Body>
           <Form>
             {_.map(this.props.itemSchema, (fieldDef, field) => {
-              const type = this._formControlTypeFromFieldDef(fieldDef)
               const fieldError = this.props.validator.fieldError(field, this.state.item)
-              let validationState
-              let validationMessage
-
-              if (fieldError) {
-                validationState = 'error'
-                validationMessage = (<HelpBlock>{fieldError}</HelpBlock>)
-              } else {
-                validationState = 'success'
-              }
 
               return (
-                <FormGroup key={field} controlId={field} className={field != 'isArchive' ? '' : 'hidden'} validationState={validationState}>
+                <FormGroup key={field} controlId={field} validationState={fieldError ? 'error' : 'success'}>
                   <ControlLabel>{humanize(field)}</ControlLabel>
-                  <FormControl autoFocus={field === firstField} type={field != 'isArchive' ? type : 'hidden'} onChange={this.handleFieldChange.bind(this, field)} defaultValue={this.props.item[field]} />
-                  {validationMessage}
+                  {this._formControlFromFieldKey(field)}
+                  {fieldError && <HelpBlock>{fieldError}</HelpBlock>}
                 </FormGroup>
               )
             })}
@@ -104,4 +115,8 @@ ItemEditor.defaultProps = {
   item: {},
   isNew: false,
   show: false,
+  validator: {
+    fieldError: () => false,
+    isItemValid: () => true
+  }
 }

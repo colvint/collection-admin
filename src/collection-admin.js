@@ -3,6 +3,8 @@ import ReactUpdate from 'react-addons-update'
 import {Button, ButtonGroup, ButtonToolbar, Checkbox, Panel, Table} from 'react-bootstrap'
 import _ from 'underscore'
 import {humanize} from 'underscore.string'
+import moment from 'moment'
+import FontAwesome from 'react-fontawesome'
 
 import GroupSelector from './group-selector'
 import Sorter from './sorter'
@@ -133,11 +135,27 @@ export default class CollectionAdmin extends React.Component {
     this.setState({items: this.filteredAndSortedItems()})
   }
 
-  undoItem( item ){
+  undoItem(item) {
     var index = this.filteredAndSortedItems().indexOf(item);
     item.isArchive = false
     this.filteredAndSortedItems().splice(index, 1, item);
     this.setState({items: this.filteredAndSortedItems()})    
+  }
+
+  _renderField(fieldKey, item) {
+    const fieldValue = item[fieldKey]
+    const fieldDef = this.props.itemSchema[fieldKey]
+
+    switch (fieldDef.type) {
+      case Boolean:
+        return fieldValue ? (<FontAwesome name="check" />) : null
+      case Number:
+        return fieldValue
+      case Date:
+        return moment(fieldValue).format('L')
+      default:
+        return fieldValue
+    }
   }
 
   render() {
@@ -197,7 +215,7 @@ export default class CollectionAdmin extends React.Component {
                     {_.map(columns, (column, j) => {
                       return (
                         <td style={{verticalAlign: "middle"}} key={j} className={column}>
-                          {item[column]}
+                          {this._renderField(column, item)}
                         </td>
                       )
                     })}
