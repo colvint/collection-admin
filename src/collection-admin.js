@@ -100,7 +100,7 @@ export default class CollectionAdmin extends React.Component {
     if (conditionEnabled){
       if (conditionType != "textContains"){
         itemFilter[field] =  conditionSpecifier[field]  
-      }else if(Object.keys(conditionSpecifier[field]).length != 1){
+      }else if(Object.keys(conditionSpecifier[field]).length != 1){                
         itemFilter[field] =  conditionSpecifier[field]
       }
     }else{         
@@ -146,16 +146,14 @@ export default class CollectionAdmin extends React.Component {
     switch (fieldDef.type) {
       case Boolean:
         return fieldValue ? (<FontAwesome name="check" />) : null
-      case Number:
-        return fieldValue
-      case Date:
+      case Date:        
         return moment(fieldValue).format('L')
       default:
         return fieldValue
     }
   }
 
-  render() {
+  render() {    
     const items = this.filteredAndSortedItems()
     const itemIds = _.pluck(items, '_id')
     const columns = this.columns()
@@ -190,7 +188,7 @@ export default class CollectionAdmin extends React.Component {
                 return (
                   <th key={i}>
                     <Sorter field={column} onSort={this.onSort}>{humanize(column)}</Sorter>
-                    <Filter field={column} onFilter={this.onFilter}/>
+                    <Filter {...this.props} field={column} onFilter={this.onFilter}/>
                   </th>
                 )
               })}
