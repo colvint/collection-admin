@@ -21,12 +21,13 @@ export default class Filter extends React.Component {
     this._getValue = this._getValue.bind(this)
     this._formControlFromFieldKey = this._formControlFromFieldKey.bind(this)
     this._valueFromInput = this._valueFromInput.bind(this)
+    this._validateInput = this._validateInput.bind(this)
   }
 
   _getValue(fieldKey, val) {
     const fieldDef = this.props.itemSchema[fieldKey]
 
-    switch (fieldDef.type) {     
+    switch (fieldDef.type) {
       case Number:
         return parseFloat(val)      
       default:
@@ -36,7 +37,6 @@ export default class Filter extends React.Component {
 
   _valueFromInput(fieldKey, e) {
     const fieldDef = this.props.itemSchema[fieldKey]
-
     switch (fieldDef.type) {
       case Boolean:
         return e.target.checked
@@ -47,6 +47,28 @@ export default class Filter extends React.Component {
       default:
         return e.target.value
     }    
+  }
+
+  _validateInput(fieldKey, itemFilter){
+    const fieldDef = this.props.itemSchema[fieldKey]
+    const value = itemFilter[fieldKey]    
+    switch (fieldDef.type) {
+      case Date:        
+        if (value.from_date != "" && value.to_date != ""){
+          if (value.to_date < value.from_date){
+            return "To Date should be greater than From Date."
+          }
+        }
+      break;  
+      case String:
+        if(!((/^[a-zA-Z]+$/).test(value))){
+          return "Enter alphabets only."
+        }
+      break;
+      default:
+        return this.props.validator.fieldError(fieldKey, itemFilter)
+      break;  
+    }
   }
 
   conditionToggled(conditionType) {
@@ -76,8 +98,7 @@ export default class Filter extends React.Component {
     this.props.onFilter({[this.props.field]: {[this.state.conditionType]: true, value: value }})
   }
 
-   _formControlFromFieldKey(fieldKey, conditionValueChanged) {
-    console.log(this.state.from_date)
+   _formControlFromFieldKey(fieldKey, conditionValueChanged) {    
     const fieldDef = this.props.itemSchema[fieldKey]    
     const controlProps = {      
       onChange: conditionValueChanged,
@@ -85,16 +106,19 @@ export default class Filter extends React.Component {
     }    
     switch (fieldDef.type) {
       case Boolean:
-        return (<Checkbox value={this.state.conditionValue} {...controlProps} />)
+        return (<Checkbox defaultValue={this.state.conditionValue} {...controlProps} />)
+        break;
       case Date:
         return (
             <div>
-              <FormControl type="date" value={moment(this.state.from_date).format('YYYY-MM-DD')} onChange={conditionValueChanged} placeholder ="From date" name="from_date"/>
-              <FormControl type="date" value={moment(this.state.to_date).format('YYYY-MM-DD')} onChange={conditionValueChanged} placeholder ="To date" name="to_date"/>
+              <FormControl type="date" defaultValue={moment(this.state.from_date).format('YYYY-MM-DD')} onChange={conditionValueChanged} placeholder ="From date" name="from_date"/>
+              <FormControl type="date" defaultValue={moment(this.state.to_date).format('YYYY-MM-DD')} onChange={conditionValueChanged} placeholder ="To date" name="to_date"/>
             </div>  
           )
+        break;  
       default:
-        return (<FormControl type="text" value={this.state.conditionValue} {...controlProps} />)
+        return (<FormControl type="text" defaultValue={this.state.conditionValue} {...controlProps} />)
+        break;  
     }
   }
 
@@ -109,15 +133,7 @@ export default class Filter extends React.Component {
         const value = this._getValue(this.props.field, this.state.conditionValue)
         let itemFilter =  {}
         itemFilter[this.props.field] =value
-        if(this.props.field == "dateOfIPO"){          
-          if (value.from_date != "" && value.to_date != ""){
-            if (value.to_date < value.from_date){
-              fieldError = "To Date should be greater than From Date"
-            }
-          }
-        }else{
-          fieldError = this.props.validator.fieldError(this.props.field, itemFilter )
-        }  
+        fieldError = this._validateInput(this.props.field, itemFilter)
       }
       
       valueControl = (

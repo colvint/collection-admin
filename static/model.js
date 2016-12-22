@@ -4,7 +4,6 @@ import uuidV4 from 'uuid/v4'
 const itemSchema = {
 	ticker: {
 		type: String,
-    regEx: /^[a-zA-Z]+$/,
 	},
 	lastPrice: {
 		type: Number,
