@@ -6,6 +6,7 @@ import _ from 'underscore'
 import {humanize} from 'underscore.string'
 import Condition, { ConditionTypes } from './conditions/meteor'
 import moment from 'moment'
+import ReactSlider from 'rc-slider'
 
 export default class Filter extends React.Component {
   constructor(props) {
@@ -15,13 +16,19 @@ export default class Filter extends React.Component {
       conditionType: null,
       conditionValue: "",
       from_date: "",
-      to_date: ""
+      to_date: "",
+      defaultNum: [0,1000],
+      marks: {
+        '0': '0',
+        '1000' : '1000'
+      }
     }    
     this.conditionValueChanged = this.conditionValueChanged.bind(this)
     this._getValue = this._getValue.bind(this)
     this._formControlFromFieldKey = this._formControlFromFieldKey.bind(this)
     this._valueFromInput = this._valueFromInput.bind(this)
     this._validateInput = this._validateInput.bind(this)
+    this.conditionNumberChanged = this.conditionNumberChanged.bind(this)
   }
 
   _getValue(fieldKey, val) {
@@ -98,7 +105,12 @@ export default class Filter extends React.Component {
     this.props.onFilter({[this.props.field]: {[this.state.conditionType]: true, value: value }})
   }
 
-   _formControlFromFieldKey(fieldKey, conditionValueChanged) {    
+  conditionNumberChanged(){
+    this.setState({conditionValue: this.refs.num.getValue()})    
+    this.props.onFilter({[this.props.field]: {[this.state.conditionType]: true, value: this.refs.num.getValue() }})
+  }
+
+  _formControlFromFieldKey(fieldKey, conditionValueChanged) {    
     const fieldDef = this.props.itemSchema[fieldKey]    
     const controlProps = {      
       onChange: conditionValueChanged,
@@ -115,7 +127,17 @@ export default class Filter extends React.Component {
               <FormControl type="date" defaultValue={moment(this.state.to_date).format('YYYY-MM-DD')} onChange={conditionValueChanged} placeholder ="To date" name="to_date"/>
             </div>  
           )
-        break;  
+        break;
+      case Number:
+        return(
+          <ReactSlider marks={this.state.marks}            
+            max={1000} 
+            range             
+            ref="num" 
+            defaultValue={this.state.defaultNum} 
+            onAfterChange={this.conditionNumberChanged}/>
+          )
+      break;  
       default:
         return (<FormControl type="text" defaultValue={this.state.conditionValue} {...controlProps} />)
         break;  

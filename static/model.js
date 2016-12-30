@@ -68,8 +68,13 @@ const fetchItems = (selector = {}, fetchOptions = {}) => {
 					}					 
 				}
 				if (condition == "textContains" ){
-					const val = selector[keys[count]].value					
-					if (keys[count] == "dateOfIPO"){
+					const val = selector[keys[count]].value	
+					if (keys[count] == "lastPrice"){
+						if( !(val[0] <= item[keys[count]] && val[1]>= item[keys[count]]) ){
+							selected.push(item)
+						}
+					}			
+					else if (keys[count] == "dateOfIPO"){
 						val.from_date = val.from_date != "" ? new Date(Date.parse(val.from_date)) : ""
 						val.to_date = val.to_date != "" ? (new Date(Date.parse(val.to_date))) : ""
 						item[keys[count]] = new Date(Date.parse(item[keys[count]]))				
